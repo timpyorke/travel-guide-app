@@ -11,6 +11,7 @@ import '../features/home/home_page.dart';
 import '../features/onboading/onboarding_page.dart';
 import '../features/main_navigation_shell.dart';
 import '../features/profile/profile_page.dart';
+import '../features/plan/plan_page.dart';
 import 'go_router_refresh_notifier.dart';
 
 part 'app_router.g.dart';
@@ -18,6 +19,7 @@ part 'app_router.g.dart';
 enum AppRoute {
   onboarding('/onboarding'),
   home('/home'),
+  plan('/plan'),
   explore('/explore'),
   favorites('/favorites'),
   profile('/profile'),
@@ -79,6 +81,16 @@ GoRouter appRouter(Ref ref) {
                 name: AppRoute.home.name,
                 pageBuilder: (context, state) =>
                     const NoTransitionPage<void>(child: HomePage()),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: AppRoute.plan.path,
+                name: AppRoute.plan.name,
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage<void>(child: PlanPage()),
               ),
             ],
           ),
