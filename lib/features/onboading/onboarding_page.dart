@@ -18,6 +18,7 @@ class OnboardingPage extends ConsumerStatefulWidget {
 class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   String? _selectedCountryOverride;
   String? _selectedCityOverride;
+  final Set<String> _selectedPreferences = <String>{};
 
   Future<void> _submit() async {
     final LocationSelection? selection = ref
@@ -66,6 +67,14 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     final List<String> cityOptions = resolvedCountry == null
         ? const <String>[]
         : controller.citiesForCountry(resolvedCountry);
+    const List<String> preferenceOptions = <String>[
+      'Culture',
+      'Food & Drink',
+      'Outdoors',
+      'Nightlife',
+      'Wellness',
+      'Family Friendly',
+    ];
 
     final bool isLoading = locationState.isLoading;
     final String title = widget.isEditing
@@ -132,6 +141,36 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                           _selectedCityOverride = newValue;
                         });
                       },
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Travel preferences',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: preferenceOptions
+                    .map(
+                      (String preference) => FilterChip(
+                        label: Text(preference),
+                        selected: _selectedPreferences.contains(preference),
+                        onSelected: (bool isSelected) {
+                          setState(() {
+                            if (isSelected) {
+                              _selectedPreferences.add(preference);
+                            } else {
+                              _selectedPreferences.remove(preference);
+                            }
+                          });
+                        },
+                      ),
+                    )
+                    .toList(),
               ),
               const Spacer(),
               FilledButton.icon(
