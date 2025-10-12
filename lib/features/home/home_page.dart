@@ -227,6 +227,7 @@ class HomePage extends ConsumerWidget {
     };
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
         onPressed: () => showQuickPlannerSheet(context),
         icon: const Icon(Icons.add),
         label: const Text('Plan trip'),

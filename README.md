@@ -7,12 +7,12 @@ Travel Guide is a mobile companion for restless explorers who want curated itine
 - **Drive conversion-ready intent:** Surface themed itineraries, food tours, and seasonal events that can be packaged into bookable experiences.
 - **Increase retention:** Keep explorers returning with fresh guides, saved plans, and a personal timeline builder that evolves with every trip.
 
-## Product Highlights
-- **Personalized Home** – Dynamic greeting, quick feature tiles, and mock “plan ahead” cards that adapt as users set their home location.
-- **Curated Explore Feed** – Gradient hero banner introduces themed collections, followed by scannable cards and destination highlights.
+- **Personalized Home** – Dynamic hero banner, city context grid, quick feature tiles, and mock “plan ahead” cards that react to a traveler’s home base.
+- **Curated Explore Feed** – Reusable welcome banner components introduce themed collections, followed by scannable cards and destination highlights.
 - **Plan Timeline** – Interactive timeline with add/edit/detail flows so travelers can assemble a day-by-day plan and tweak it on the fly.
 - **Quick Planner FAB** – Full-height bottom sheet with templates, preference chips, and description capture for instant itinerary drafts.
-- **Onboarding & Preferences** – Riverpod-backed location selector and travel preference chips to seed recommendations from first launch.
+- **Onboarding & Preferences** – Riverpod-backed location selector, explicit travel preferences, localization preview, and guest vs. signed-in profile states.
+- **Reusable UI Kit** – Shared widgets (`WelcomeBanner`, `CityContextGrid`, `ProfileHeader`, etc.) ensure consistent experiences across home, explore, favorites, and profile screens.
 
 ## Target Personas
 | Persona | Need | How Travel Guide Helps |

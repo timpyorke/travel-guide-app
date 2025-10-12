@@ -21,7 +21,7 @@ lib/
     profile/                # Profile placeholder
     location/               # Onboarding location selection + Riverpod providers
     onboading/              # Onboarding/change-location screen
-  widgets/                  # Reusable UI components (cards, sections, sheets)
+  widgets/                  # Reusable UI components (banners, grids, profile sections, sheets)
 ```
 
 ## Core Concepts
@@ -37,8 +37,8 @@ lib/
 - Other modules currently rely on mock data, but the pattern is in place to introduce additional providers when real APIs are connected.
 
 ### Higher-Level Widgets
-- `FeatureCard`, `PlanHeroBanner`, `TripTimeline`, `PlanAheadSection`, and `TravelInsightsSection` are reusable pieces that encapsulate styling and layout.
-- Floating action buttons and bottom sheets (e.g., `QuickPlannerSheet`) are kept separate for testability and reuse.
+- `WelcomeBanner`, `CityContextGrid`, `CityDetailPage`, `FeatureCard`, `PlanHeroBanner`, `TripTimeline`, `PlanAheadSection`, `ProfileHeader`, and `ProfileSettingsCard` centralize styling and interaction patterns.
+- Floating action buttons and bottom sheets (e.g., `QuickPlannerSheet`, profile edit/privacy/notification sheets) are kept separate for testability and reuse.
 
 ### Timeline Planning Flow
 - `PlanPage` maintains a mutable list of `TimelineEntry` objects.
@@ -49,6 +49,11 @@ lib/
 - `HomeFeature` / `FeatureListSection` / `FeatureListEntry` define structured mock content for each home tile.
 - `FeatureListPage` renders grouped lists with section headers and uses `FeatureDetailPage` for deeper content preview.
 - Replace these mock model instances with data from APIs or CMS as the product matures.
+
+### Profile & Auth Flow
+- Lightweight auth state lives in `lib/features/auth/providers/auth_provider.dart`; the profile page watches this provider to toggle guest vs. signed-in experiences.
+- Profile UI is composed from reusable widgets (`ProfileHeader`, `GuestAuthActions`, `PreferencesSection`, `ProfileSettingsCard`) so other features can reuse the same sections if needed.
+- Guest users see sign-in/create-account CTAs and limited settings, while signed-in users can edit profile details, preferences, privacy, and notification options.
 
 ## Environment & Tooling
 - **Run the app:** `flutter run`
