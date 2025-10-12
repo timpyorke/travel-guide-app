@@ -208,7 +208,20 @@ class HomePage extends ConsumerWidget {
     final String greetingSubtitle = selection == null
         ? 'Set your travel home base to unlock tailored guides.'
         : 'Exploring ideas for ${selection.city}, ${selection.country}.';
-
+    final String bannerTitle = selection == null
+        ? 'Welcome to ${F.title}'
+        : 'Welcome to ${selection.city}';
+    final String aboutLabel = selection?.city == null
+        ? 'About this destination'
+        : 'About ${selection?.city}';
+    final List<String> cityContext = <String>[
+      'The city',
+      'History',
+      'Etymology',
+      'Geography',
+      'Cityscape',
+      'Economy',
+    ];
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => showQuickPlannerSheet(context),
@@ -221,21 +234,88 @@ class HomePage extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
-                'Welcome to ${F.title}',
-                style: Theme.of(
-                  context,
-                )
-                    .textTheme
-                    .headlineMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                greetingSubtitle,
-                style: Theme.of(context).textTheme.bodyLarge,
+              AspectRatio(
+                aspectRatio: 16 / 9,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(28),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: <Widget>[
+                      Image.network(
+                        'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
+                        fit: BoxFit.cover,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: <Color>[
+                              Colors.black.withOpacity(0.2),
+                              Colors.black.withOpacity(0.65),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            Text(
+                              bannerTitle,
+                              style: Theme.of(context).textTheme.headlineMedium
+                                  ?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              greetingSubtitle,
+                              style: Theme.of(context).textTheme.bodyLarge
+                                  ?.copyWith(color: Colors.white70),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
               const SizedBox(height: 24),
+              Text(
+                aboutLabel,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 12),
+              GridView.count(
+                crossAxisCount: 3,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: 5 / 3,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                children: cityContext
+                    .map(
+                      (String label) => _CityInfoTile(
+                        title: label,
+                        icon: _cityInfoIcon(label),
+                      ),
+                    )
+                    .toList(),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Explore Features',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 12),
               GridView.count(
                 crossAxisCount: 2,
                 mainAxisSpacing: 16,
@@ -257,7 +337,6 @@ class HomePage extends ConsumerWidget {
                     ),
                 ],
               ),
-              const SizedBox(height: 32),
               Text(
                 'Plan Ahead',
                 style: Theme.of(
@@ -266,7 +345,7 @@ class HomePage extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               PlanAheadSection(trips: upcomingTrips),
-              const SizedBox(height: 32),
+              const SizedBox(height: 12),
               Text(
                 'Travel Insights',
                 style: Theme.of(
@@ -277,6 +356,66 @@ class HomePage extends ConsumerWidget {
               TravelInsightsSection(insights: travelInsights),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+IconData _cityInfoIcon(String label) {
+  switch (label) {
+    case 'The city':
+      return Icons.location_city;
+    case 'History':
+      return Icons.history_edu;
+    case 'Etymology':
+      return Icons.translate;
+    case 'Geography':
+      return Icons.map_outlined;
+    case 'Cityscape':
+      return Icons.apartment;
+    case 'Economy':
+      return Icons.trending_up;
+    default:
+      return Icons.info_outline;
+  }
+}
+
+class _CityInfoTile extends StatelessWidget {
+  const _CityInfoTile({required this.title, required this.icon});
+
+  final String title;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colors = theme.colorScheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.primaryContainer.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Column(
+          children: <Widget>[
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: colors.primary.withOpacity(0.15),
+              child: Icon(icon, size: 18, color: colors.primary),
+            ),
+            const SizedBox(height: 4),
+            Expanded(
+              child: Text(
+                title,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
