@@ -8,7 +8,7 @@ import 'package:travel_guide/widgets/travel_insights_section.dart';
 import '../location/models/location_selection.dart';
 import '../location/providers/location_controller.dart';
 import 'models/home_feature.dart';
-import 'views/feature_list_page.dart';
+import '../list/feature_list_page.dart';
 import '../../flavors.dart';
 
 class HomePage extends ConsumerWidget {

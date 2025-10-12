@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/home_feature.dart';
+import '../home/models/home_feature.dart';
 
 class FeatureDetailPage extends StatelessWidget {
   const FeatureDetailPage({

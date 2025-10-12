@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../models/home_feature.dart';
-import 'feature_detail_page.dart';
+import '../home/models/home_feature.dart';
+import '../detail/feature_detail_page.dart';
 
 class FeatureListPage extends StatelessWidget {
   const FeatureListPage({
