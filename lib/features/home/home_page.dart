@@ -10,8 +10,9 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<LocationSelection?> locationState =
-        ref.watch(locationControllerProvider);
+    final AsyncValue<LocationSelection?> locationState = ref.watch(
+      locationControllerProvider,
+    );
     final LocationSelection? selection = locationState.valueOrNull;
     final String greetingSubtitle = selection == null
         ? 'Set your travel home base to unlock tailored guides.'
@@ -102,14 +103,14 @@ class _FeatureCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: 8),
             Text(
               subtitle,
               style: Theme.of(context).textTheme.bodySmall,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
