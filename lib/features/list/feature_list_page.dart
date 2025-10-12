@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../home/models/home_feature.dart';
 import '../detail/feature_detail_page.dart';
