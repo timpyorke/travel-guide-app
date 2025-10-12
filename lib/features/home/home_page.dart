@@ -304,6 +304,14 @@ class HomePage extends ConsumerWidget {
                       (String label) => _CityInfoTile(
                         title: label,
                         icon: _cityInfoIcon(label),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => _CityDetailPage(
+                              category: label,
+                              city: selection?.city,
+                            ),
+                          ),
+                        ),
                       ),
                     )
                     .toList(),
@@ -382,41 +390,85 @@ IconData _cityInfoIcon(String label) {
 }
 
 class _CityInfoTile extends StatelessWidget {
-  const _CityInfoTile({required this.title, required this.icon});
+  const _CityInfoTile({required this.title, required this.icon, this.onTap});
 
   final String title;
   final IconData icon;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colors = theme.colorScheme;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colors.primaryContainer.withOpacity(0.4),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
         borderRadius: BorderRadius.circular(20),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Column(
-          children: <Widget>[
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: colors.primary.withOpacity(0.15),
-              child: Icon(icon, size: 18, color: colors.primary),
-            ),
-            const SizedBox(height: 4),
-            Expanded(
-              child: Text(
-                title,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontWeight: FontWeight.w600,
+        onTap: onTap,
+        child: Ink(
+          decoration: BoxDecoration(
+            color: colors.primaryContainer.withOpacity(0.4),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Column(
+            children: <Widget>[
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: colors.primary.withOpacity(0.15),
+                child: Icon(icon, size: 18, color: colors.primary),
+              ),
+              const SizedBox(height: 4),
+              Expanded(
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+      ),
+    );
+  }
+}
+
+class _CityDetailPage extends StatelessWidget {
+  const _CityDetailPage({super.key, required this.category, this.city});
+
+  final String category;
+  final String? city;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final String title = city == null ? category : '$category · $city';
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: ListView(
+        padding: const EdgeInsets.all(24),
+        children: <Widget>[
+          Text(
+            category,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'We\'re preparing rich content for $category. Soon you\'ll find curated essays, multimedia, and guides tailored to your selected city.',
+            style: theme.textTheme.bodyLarge,
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'In the meantime, explore other sections or personalize your home base to unlock more insights.',
+            style: theme.textTheme.bodyMedium,
+          ),
+        ],
       ),
     );
   }
