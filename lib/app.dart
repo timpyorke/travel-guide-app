@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'flavors.dart';
-import 'pages/my_home_page.dart';
+import 'router/app_router.dart';
 
-class App extends StatelessWidget {
+class App extends ConsumerWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: F.title,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(appRouterProvider);
+    final title = F.title;
+
+    return MaterialApp.router(
+      title: title,
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: Scaffold(
-        appBar: AppBar(title: Text(F.title)),
-        body: const MyHomePage(),
-      ),
+      routerConfig: router,
     );
   }
 }

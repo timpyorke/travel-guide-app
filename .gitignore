@@ -37,10 +37,22 @@ migrate_working_dir/
 /build/
 **/build/
 coverage/
-lib/generated_plugin_registrant.dart
+lib/**/generated_plugin_registrant.dart
+lib/flutter_gen/**
+lib/generated/**
+lib/**/l10n/generated/**
+lib/**/*.g.dart
 ios/Flutter/flutter_export_environment.sh
 ios/Flutter/ephemeral/
 ios/Flutter/Generated.xcconfig
+ios/Flutter/development*.xcconfig
+ios/Flutter/production*.xcconfig
+ios/Runner/GeneratedPluginRegistrant.*
+macos/Flutter/GeneratedPluginRegistrant.swift
+windows/runner/GeneratedPluginRegistrant.*
+android/app/flavorizr.gradle.kts
+android/app/src/development/
+android/app/src/production/
 
 # Platform build intermediates
 **/android/.gradle/
