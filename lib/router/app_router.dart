@@ -1,20 +1,27 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../features/location/models/location_selection.dart';
+import '../features/location/providers/location_controller.dart';
 import '../pages/explore_page.dart';
 import '../pages/favorites_page.dart';
 import '../pages/home_page.dart';
+import '../pages/location_onboarding_page.dart';
 import '../pages/main_navigation_shell.dart';
 import '../pages/profile_page.dart';
+import 'go_router_refresh_notifier.dart';
 
 part 'app_router.g.dart';
 
 enum AppRoute {
+  onboarding('/onboarding'),
   home('/home'),
   explore('/explore'),
   favorites('/favorites'),
-  profile('/profile');
+  profile('/profile'),
+  editLocation('/profile/edit-location');
 
   const AppRoute(this.path);
 
@@ -23,9 +30,44 @@ enum AppRoute {
 
 @Riverpod(keepAlive: true)
 GoRouter appRouter(Ref ref) {
+  final GoRouterRefreshNotifier refreshNotifier = GoRouterRefreshNotifier(
+    ref: ref,
+    listenable: locationControllerProvider,
+  );
+  ref.onDispose(refreshNotifier.dispose);
+
   return GoRouter(
     initialLocation: AppRoute.home.path,
+    refreshListenable: refreshNotifier,
+    redirect: (context, state) {
+      final AsyncValue<LocationSelection?> locationState =
+          ref.read(locationControllerProvider);
+      final String currentPath = state.matchedLocation;
+      final bool isOnboarding = currentPath == AppRoute.onboarding.path;
+      final bool hasLocation = locationState.valueOrNull != null;
+
+      if (locationState.isLoading) {
+        return null;
+      }
+
+      if (!hasLocation && !isOnboarding) {
+        return AppRoute.onboarding.path;
+      }
+
+      if (hasLocation && isOnboarding) {
+        return AppRoute.home.path;
+      }
+
+      return null;
+    },
     routes: <RouteBase>[
+      GoRoute(
+        path: AppRoute.onboarding.path,
+        name: AppRoute.onboarding.name,
+        pageBuilder: (context, state) => const NoTransitionPage<void>(
+          child: LocationOnboardingPage(),
+        ),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
             MainNavigationShell(navigationShell: navigationShell),
@@ -71,6 +113,16 @@ GoRouter appRouter(Ref ref) {
                 pageBuilder: (context, state) => const NoTransitionPage<void>(
                   child: ProfilePage(),
                 ),
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: 'edit-location',
+                    name: AppRoute.editLocation.name,
+                    pageBuilder: (context, state) =>
+                        const MaterialPage<void>(
+                      child: LocationOnboardingPage(isEditing: true),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-class ProfilePage extends StatelessWidget {
+import '../features/location/models/location_selection.dart';
+import '../features/location/providers/location_controller.dart';
+import '../router/app_router.dart';
+
+class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
+    final AsyncValue<LocationSelection?> locationState =
+        ref.watch(locationControllerProvider);
+    final LocationSelection? selection = locationState.valueOrNull;
+    final String locationLabel =
+        selection == null ? 'Set a home base to personalize trips' : '${selection.city}, ${selection.country}';
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -55,20 +67,27 @@ class ProfilePage extends StatelessWidget {
             Card(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               child: Column(
-                children: const <Widget>[
+                children: <Widget>[
                   _SettingsTile(
+                    icon: Icons.place_outlined,
+                    title: 'Travel home base',
+                    subtitle: locationLabel,
+                    onTap: () => context.pushNamed(AppRoute.editLocation.name),
+                  ),
+                  const Divider(height: 1),
+                  const _SettingsTile(
                     icon: Icons.notifications_outlined,
                     title: 'Notifications',
                     subtitle: 'Trip updates and reminders',
                   ),
-                  Divider(height: 1),
-                  _SettingsTile(
+                  const Divider(height: 1),
+                  const _SettingsTile(
                     icon: Icons.security,
                     title: 'Privacy',
                     subtitle: 'Manage visibility and data',
                   ),
-                  Divider(height: 1),
-                  _SettingsTile(
+                  const Divider(height: 1),
+                  const _SettingsTile(
                     icon: Icons.help_outline,
                     title: 'Support',
                     subtitle: 'FAQ and contact options',
@@ -112,11 +131,13 @@ class _SettingsTile extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.subtitle,
+    this.onTap,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -126,6 +147,7 @@ class _SettingsTile extends StatelessWidget {
       subtitle: Text(subtitle),
       trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+      onTap: onTap,
     );
   }
 }

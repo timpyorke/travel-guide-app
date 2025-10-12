@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../features/location/models/location_selection.dart';
+import '../features/location/providers/location_controller.dart';
 import '../flavors.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AsyncValue<LocationSelection?> locationState =
+        ref.watch(locationControllerProvider);
+    final LocationSelection? selection = locationState.valueOrNull;
+    final String greetingSubtitle = selection == null
+        ? 'Set your travel home base to unlock tailored guides.'
+        : 'Exploring ideas for ${selection.city}, ${selection.country}.';
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -18,7 +29,7 @@ class HomePage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Plan your next adventure with curated guides, destinations, and personalized recommendations.',
+              greetingSubtitle,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 24),
