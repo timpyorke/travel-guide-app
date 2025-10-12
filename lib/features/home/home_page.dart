@@ -7,10 +7,171 @@ import 'package:travel_guide/widgets/travel_insights_section.dart';
 
 import '../location/models/location_selection.dart';
 import '../location/providers/location_controller.dart';
+import 'models/home_feature.dart';
+import 'views/feature_list_page.dart';
 import '../../flavors.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
+
+  static const List<HomeFeature> _homeFeatures = <HomeFeature>[
+    HomeFeature(
+      id: 'itineraries',
+      title: 'Itineraries',
+      subtitle: 'Handpicked routes across top destinations.',
+      icon: Icons.map,
+      content: <FeatureListSection>[
+        FeatureListSection(
+          heading: 'Kyoto, Japan',
+          entries: <FeatureListEntry>[
+            FeatureListEntry(
+              id: 'kyoto-day1',
+              title: 'Two-day Cherry Blossom Walk',
+              subtitle: 'Kyoto • 2 days • Spring',
+              detail:
+                  'Experience Kyoto\'s blossom season with temple visits, tea ceremonies, and scenic hikes.',
+            ),
+            FeatureListEntry(
+              id: 'kyoto-day2',
+              title: 'Gion Cultural Evening',
+              subtitle: 'Kyoto • 1 evening',
+              detail:
+                  'Wander historic alleys, catch traditional performances, and dine in intimate kaiseki venues.',
+            ),
+          ],
+        ),
+        FeatureListSection(
+          heading: 'Lisbon, Portugal',
+          entries: <FeatureListEntry>[
+            FeatureListEntry(
+              id: 'lisbon-weekend',
+              title: 'Against the Atlantic Breeze',
+              subtitle: 'Lisbon • 3 days',
+              detail:
+                  'A city-to-coast jump featuring pastel delights, fado nights, and day trips to Sintra cliffs.',
+            ),
+          ],
+        ),
+      ],
+    ),
+    HomeFeature(
+      id: 'eats',
+      title: 'Local Eats',
+      subtitle: 'Taste the culture with foodie favorites.',
+      icon: Icons.restaurant,
+      content: <FeatureListSection>[
+        FeatureListSection(
+          heading: 'Chiang Mai Classics',
+          entries: <FeatureListEntry>[
+            FeatureListEntry(
+              id: 'chiangmai-lanna',
+              title: 'Lanna Flavors Night Market',
+              subtitle: 'Chiang Mai • 1 night',
+              detail:
+                  'Sample khao soi, sai oua, and coconut ice cream across lively street stalls.',
+            ),
+            FeatureListEntry(
+              id: 'chiangmai-coffee',
+              title: 'Doi Coffee Roastery Hop',
+              subtitle: 'Chiang Mai • Half day',
+              detail:
+                  'Sip single-origin pours from mountain cooperatives paired with locally baked pastries.',
+            ),
+          ],
+        ),
+        FeatureListSection(
+          heading: 'Barcelona Bites',
+          entries: <FeatureListEntry>[
+            FeatureListEntry(
+              id: 'barcelona-tapas',
+              title: 'Tapas Trail in El Born',
+              subtitle: 'Barcelona • Evening',
+              detail:
+                  'Discover pintxos bars, vermouth tastings, and sweet churros around medieval squares.',
+            ),
+          ],
+        ),
+      ],
+    ),
+    HomeFeature(
+      id: 'festivals',
+      title: 'Festivals',
+      subtitle: 'Don\'t miss the best seasonal events.',
+      icon: Icons.event,
+      content: <FeatureListSection>[
+        FeatureListSection(
+          heading: 'Global Calendar',
+          entries: <FeatureListEntry>[
+            FeatureListEntry(
+              id: 'edinburgh-fringe',
+              title: 'Edinburgh Fringe',
+              subtitle: 'Scotland • August',
+              detail:
+                  'World\'s largest arts festival with over 3,000 shows across comedy, theatre, and improv.',
+            ),
+            FeatureListEntry(
+              id: 'songkran',
+              title: 'Songkran Water Festival',
+              subtitle: 'Thailand • April',
+              detail:
+                  'Join nationwide water fights, temple rituals, and street parades welcoming Thai New Year.',
+            ),
+          ],
+        ),
+        FeatureListSection(
+          heading: 'Local Picks',
+          entries: <FeatureListEntry>[
+            FeatureListEntry(
+              id: 'tokyo-design',
+              title: 'Tokyo Design Week',
+              subtitle: 'Japan • October',
+              detail:
+                  'Immersive exhibitions, pop-up studios, and collaborative installations across the city.',
+            ),
+          ],
+        ),
+      ],
+    ),
+    HomeFeature(
+      id: 'tips',
+      title: 'Tips',
+      subtitle: 'Travel smarter with pro insights.',
+      icon: Icons.tips_and_updates,
+      content: <FeatureListSection>[
+        FeatureListSection(
+          heading: 'Practical Guides',
+          entries: <FeatureListEntry>[
+            FeatureListEntry(
+              id: 'smart-packing',
+              title: 'Smart Packing for Multi-Climate Trips',
+              subtitle: 'Checklists • Gear • Hacks',
+              detail:
+                  'Layer with merino essentials, compress bulk, and build modular outfits adaptable to any climate.',
+            ),
+            FeatureListEntry(
+              id: 'airport-ninja',
+              title: 'Airport Ninja Moves',
+              subtitle: 'Boarding • Security • Lounges',
+              detail:
+                  'Leverage digital queues, lounge passes, and seat alerts to breeze from check-in to take-off.',
+            ),
+          ],
+        ),
+        FeatureListSection(
+          heading: 'Mindful Travel',
+          entries: <FeatureListEntry>[
+            FeatureListEntry(
+              id: 'slow-travel',
+              title: 'What Slow Travel Actually Means',
+              subtitle: 'Community • Culture • Connection',
+              detail:
+                  'Build longer stays, learn local phrases, and contribute to community-led experiences.',
+            ),
+          ],
+        ),
+      ],
+    ),
+  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -82,27 +243,18 @@ class HomePage extends ConsumerWidget {
                 childAspectRatio: 4 / 3,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                children: const <Widget>[
-                  FeatureCard(
-                    icon: Icons.map,
-                    title: 'Itineraries',
-                    subtitle: 'Handpicked routes across top destinations.',
-                  ),
-                  FeatureCard(
-                    icon: Icons.restaurant,
-                    title: 'Local Eats',
-                    subtitle: 'Taste the culture with foodie favorites.',
-                  ),
-                  FeatureCard(
-                    icon: Icons.event,
-                    title: 'Festivals',
-                    subtitle: 'Don\'t miss the best seasonal events.',
-                  ),
-                  FeatureCard(
-                    icon: Icons.tips_and_updates,
-                    title: 'Tips',
-                    subtitle: 'Travel smarter with pro insights.',
-                  ),
+                children: <Widget>[
+                  for (final HomeFeature feature in _homeFeatures)
+                    FeatureCard(
+                      icon: feature.icon,
+                      title: feature.title,
+                      subtitle: feature.subtitle,
+                      onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => FeatureListPage(feature: feature),
+                        ),
+                      ),
+                    ),
                 ],
               ),
               const SizedBox(height: 32),
