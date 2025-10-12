@@ -5,12 +5,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../features/location/models/location_selection.dart';
 import '../features/location/providers/location_controller.dart';
-import '../pages/explore_page.dart';
-import '../pages/favorites_page.dart';
-import '../pages/home_page.dart';
-import '../pages/location_onboarding_page.dart';
-import '../pages/main_navigation_shell.dart';
-import '../pages/profile_page.dart';
+import '../features/explore/explore_page.dart';
+import '../features/favorites/favorites_page.dart';
+import '../features/home/home_page.dart';
+import '../features/onboading/onboarding_page.dart';
+import '../features/main_navigation_shell.dart';
+import '../features/profile/profile_page.dart';
 import 'go_router_refresh_notifier.dart';
 
 part 'app_router.g.dart';
@@ -40,8 +40,9 @@ GoRouter appRouter(Ref ref) {
     initialLocation: AppRoute.home.path,
     refreshListenable: refreshNotifier,
     redirect: (context, state) {
-      final AsyncValue<LocationSelection?> locationState =
-          ref.read(locationControllerProvider);
+      final AsyncValue<LocationSelection?> locationState = ref.read(
+        locationControllerProvider,
+      );
       final String currentPath = state.matchedLocation;
       final bool isOnboarding = currentPath == AppRoute.onboarding.path;
       final bool hasLocation = locationState.valueOrNull != null;
@@ -64,9 +65,8 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoute.onboarding.path,
         name: AppRoute.onboarding.name,
-        pageBuilder: (context, state) => const NoTransitionPage<void>(
-          child: LocationOnboardingPage(),
-        ),
+        pageBuilder: (context, state) =>
+            const NoTransitionPage<void>(child: OnboardingPage()),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
@@ -77,9 +77,8 @@ GoRouter appRouter(Ref ref) {
               GoRoute(
                 path: AppRoute.home.path,
                 name: AppRoute.home.name,
-                pageBuilder: (context, state) => const NoTransitionPage<void>(
-                  child: HomePage(),
-                ),
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage<void>(child: HomePage()),
               ),
             ],
           ),
@@ -88,9 +87,8 @@ GoRouter appRouter(Ref ref) {
               GoRoute(
                 path: AppRoute.explore.path,
                 name: AppRoute.explore.name,
-                pageBuilder: (context, state) => const NoTransitionPage<void>(
-                  child: ExplorePage(),
-                ),
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage<void>(child: ExplorePage()),
               ),
             ],
           ),
@@ -99,9 +97,8 @@ GoRouter appRouter(Ref ref) {
               GoRoute(
                 path: AppRoute.favorites.path,
                 name: AppRoute.favorites.name,
-                pageBuilder: (context, state) => const NoTransitionPage<void>(
-                  child: FavoritesPage(),
-                ),
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage<void>(child: FavoritesPage()),
               ),
             ],
           ),
@@ -110,16 +107,14 @@ GoRouter appRouter(Ref ref) {
               GoRoute(
                 path: AppRoute.profile.path,
                 name: AppRoute.profile.name,
-                pageBuilder: (context, state) => const NoTransitionPage<void>(
-                  child: ProfilePage(),
-                ),
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage<void>(child: ProfilePage()),
                 routes: <RouteBase>[
                   GoRoute(
                     path: 'edit-location',
                     name: AppRoute.editLocation.name,
-                    pageBuilder: (context, state) =>
-                        const MaterialPage<void>(
-                      child: LocationOnboardingPage(isEditing: true),
+                    pageBuilder: (context, state) => const MaterialPage<void>(
+                      child: OnboardingPage(isEditing: true),
                     ),
                   ),
                 ],

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../features/location/models/location_selection.dart';
-import '../features/location/providers/location_controller.dart';
-import '../router/app_router.dart';
+import '../location/models/location_selection.dart';
+import '../location/providers/location_controller.dart';
+import '../../router/app_router.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});

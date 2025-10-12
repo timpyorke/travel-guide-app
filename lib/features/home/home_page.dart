@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../features/location/models/location_selection.dart';
-import '../features/location/providers/location_controller.dart';
-import '../flavors.dart';
+import '../location/models/location_selection.dart';
+import '../location/providers/location_controller.dart';
+import '../../flavors.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});

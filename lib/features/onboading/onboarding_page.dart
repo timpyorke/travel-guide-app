@@ -2,31 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../features/location/models/location_selection.dart';
-import '../features/location/providers/location_controller.dart';
-import '../router/app_router.dart';
+import '../location/models/location_selection.dart';
+import '../location/providers/location_controller.dart';
+import '../../router/app_router.dart';
 
-class LocationOnboardingPage extends ConsumerStatefulWidget {
-  const LocationOnboardingPage({
-    super.key,
-    this.isEditing = false,
-  });
+class OnboardingPage extends ConsumerStatefulWidget {
+  const OnboardingPage({super.key, this.isEditing = false});
 
   final bool isEditing;
 
   @override
-  ConsumerState<LocationOnboardingPage> createState() =>
-      _LocationOnboardingPageState();
+  ConsumerState<OnboardingPage> createState() => _OnboardingPageState();
 }
 
-class _LocationOnboardingPageState
-    extends ConsumerState<LocationOnboardingPage> {
+class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   String? _selectedCountryOverride;
   String? _selectedCityOverride;
 
   Future<void> _submit() async {
-    final LocationSelection? selection =
-        ref.read(locationControllerProvider).valueOrNull;
+    final LocationSelection? selection = ref
+        .read(locationControllerProvider)
+        .valueOrNull;
     final String? country = _selectedCountryOverride ?? selection?.country;
     final String? city = _selectedCityOverride ?? selection?.city;
     if (country == null || city == null) {
@@ -78,9 +74,7 @@ class _LocationOnboardingPageState
 
     return Scaffold(
       appBar: widget.isEditing
-          ? AppBar(
-              title: const Text('Change home location'),
-            )
+          ? AppBar(title: const Text('Change home location'))
           : null,
       body: SafeArea(
         child: Padding(
@@ -88,10 +82,7 @@ class _LocationOnboardingPageState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
-                title,
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
+              Text(title, style: Theme.of(context).textTheme.headlineSmall),
               const SizedBox(height: 12),
               Text(
                 'Pick a country and city to personalize your travel guide recommendations.',
