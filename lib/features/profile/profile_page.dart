@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:travel_guide/widgets/profile_sections.dart';
 
 import '../auth/models/auth_state.dart';
 import '../auth/providers/auth_provider.dart';
@@ -79,66 +80,24 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                CircleAvatar(
-                  radius: 36,
-                  backgroundColor: theme.colorScheme.primary,
-                  child: Text(
-                    _initials(effectiveName),
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      color: theme.colorScheme.onPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(effectiveName, style: theme.textTheme.titleLarge),
-                      const SizedBox(height: 4),
-                      Text(tagline, style: theme.textTheme.bodyMedium),
-                      const SizedBox(height: 4),
-                    ],
-                  ),
-                ),
-              ],
+            ProfileHeader(
+              initials: _initials(effectiveName),
+              displayName: effectiveName,
+              tagline: tagline,
+              showEditButton: !isGuest,
+              onEdit: isGuest ? null : _openProfileEditor,
             ),
             const SizedBox(height: 16),
-            if (isGuest)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: FilledButton(
-                          onPressed: _openAuthSheet,
-                          child: const Text('Sign in'),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: _openAuthSheet,
-                          child: const Text('Create account'),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
+            if (isGuest) ...<Widget>[
+              GuestAuthActions(
+                onSignIn: _openAuthSheet,
+                onCreateAccount: _openAuthSheet,
+                message:
                     'Sign in to save plans, sync preferences, and access exclusive itineraries.',
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 32),
-                ],
               ),
-            if (!isGuest) ...<Widget>[
-              _SectionHeader(
+              const SizedBox(height: 32),
+            ] else ...<Widget>[
+              SectionHeader(
                 title: 'Travel Preferences',
                 action: TextButton.icon(
                   onPressed: _openProfileEditor,
@@ -147,84 +106,64 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 ),
               ),
               const SizedBox(height: 12),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: _availablePreferences.map((String preference) {
-                  final bool isSelected = _selectedPreferences.contains(
-                    preference,
-                  );
-                  return ChoiceChip(
-                    label: Text(preference),
-                    selected: isSelected,
-                    onSelected: (bool value) {
-                      setState(() {
-                        if (value) {
-                          _selectedPreferences.add(preference);
-                        } else {
-                          _selectedPreferences.remove(preference);
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
+              PreferencesSection(
+                options: _availablePreferences,
+                selected: _selectedPreferences,
+                onToggle: (String preference, bool value) {
+                  setState(() {
+                    if (value) {
+                      _selectedPreferences.add(preference);
+                    } else {
+                      _selectedPreferences.remove(preference);
+                    }
+                  });
+                },
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
             ],
             Text('Account Settings', style: theme.textTheme.titleMedium),
             const SizedBox(height: 12),
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                children: <Widget>[
-                  if (!isGuest) ...<Widget>[
-                    _SettingsTile(
-                      icon: Icons.manage_accounts_outlined,
-                      title: 'Profile details',
-                      subtitle: 'Update name & travel style',
-                      onTap: _openProfileEditor,
-                    ),
-                    const Divider(height: 1),
-                    _SettingsTile(
-                      icon: Icons.place_outlined,
-                      title: 'Travel home base',
-                      subtitle: locationLabel,
-                      onTap: () =>
-                          context.pushNamed(AppRoute.editLocation.name),
-                    ),
-                    const Divider(height: 1),
-                  ],
-                  _SettingsTile(
-                    icon: Icons.language,
-                    title: 'App language',
-                    subtitle: _selectedLanguage,
-                    onTap: _openLanguageSheet,
+            ProfileSettingsCard(
+              tiles: <SettingsTileData>[
+                if (!isGuest)
+                  SettingsTileData(
+                    icon: Icons.manage_accounts_outlined,
+                    title: 'Profile details',
+                    subtitle: 'Update name & travel style',
+                    onTap: _openProfileEditor,
                   ),
-                  const Divider(height: 1),
-                  _SettingsTile(
-                    icon: Icons.notifications_outlined,
-                    title: 'Notifications',
-                    subtitle: notificationSubtitle,
-                    onTap: isGuest ? _openAuthSheet : _openNotificationSettings,
+                if (!isGuest)
+                  SettingsTileData(
+                    icon: Icons.place_outlined,
+                    title: 'Travel home base',
+                    subtitle: locationLabel,
+                    onTap: () => context.pushNamed(AppRoute.editLocation.name),
                   ),
-                  const Divider(height: 1),
-                  _SettingsTile(
-                    icon: Icons.security,
-                    title: 'Privacy',
-                    subtitle: 'Manage visibility and data',
-                    onTap: _openPrivacySettings,
-                  ),
-                  const Divider(height: 1),
-                  _SettingsTile(
-                    icon: Icons.help_outline,
-                    title: 'Support',
-                    subtitle: 'FAQ and contact options',
-                    onTap: _openSupportSheet,
-                  ),
-                ],
-              ),
+                SettingsTileData(
+                  icon: Icons.language,
+                  title: 'App language',
+                  subtitle: _selectedLanguage,
+                  onTap: _openLanguageSheet,
+                ),
+                SettingsTileData(
+                  icon: Icons.notifications_outlined,
+                  title: 'Notifications',
+                  subtitle: notificationSubtitle,
+                  onTap: isGuest ? _openAuthSheet : _openNotificationSettings,
+                ),
+                SettingsTileData(
+                  icon: Icons.security,
+                  title: 'Privacy',
+                  subtitle: 'Manage visibility and data',
+                  onTap: _openPrivacySettings,
+                ),
+                SettingsTileData(
+                  icon: Icons.help_outline,
+                  title: 'Support',
+                  subtitle: 'FAQ and contact options',
+                  onTap: _openSupportSheet,
+                ),
+              ],
             ),
             if (!isGuest)
               Padding(
@@ -828,50 +767,5 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       secondChar = 'G';
     }
     return (firstChar + secondChar).toUpperCase();
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title, required this.action});
-
-  final String title;
-  final Widget action;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: Text(title, style: Theme.of(context).textTheme.titleMedium),
-        ),
-        action,
-      ],
-    );
-  }
-}
-
-class _SettingsTile extends StatelessWidget {
-  const _SettingsTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    this.onTap,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(icon),
-      title: Text(title),
-      subtitle: Text(subtitle),
-      trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-      onTap: onTap,
-    );
   }
 }

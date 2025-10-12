@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:travel_guide/widgets/feature_card.dart';
+import 'package:travel_guide/widgets/welcome_banner.dart';
 
 import '../detail/feature_detail_page.dart';
 import '../home/models/home_feature.dart';
@@ -183,47 +184,20 @@ class ExplorePage extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.all(24),
         children: <Widget>[
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: <Color>[
-                  colorScheme.primary,
-                  colorScheme.primary.withOpacity(0.7),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(28),
+          WelcomeBanner(
+            imageUrl:
+                'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1600&q=80',
+            title: 'Discover More',
+            subtitle: 'Unlock curated recommendations tailored to your travel vibe.',
+          ),
+          const SizedBox(height: 16),
+          FilledButton.icon(
+            onPressed: () {},
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  'Discover More',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: colorScheme.onPrimary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Unlock curated recommendations tailored to your travel vibe.',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(color: colorScheme.onPrimary.withOpacity(0.85)),
-                ),
-                const SizedBox(height: 16),
-                FilledButton.icon(
-                  onPressed: () {},
-                  style: FilledButton.styleFrom(
-                    backgroundColor: colorScheme.onPrimary,
-                    foregroundColor: colorScheme.primary,
-                  ),
-                  icon: const Icon(Icons.explore),
-                  label: const Text('Personalize explore feed'),
-                ),
-              ],
-            ),
+            icon: const Icon(Icons.explore),
+            label: const Text('Personalize explore feed'),
           ),
           const SizedBox(height: 24),
           GridView.count(

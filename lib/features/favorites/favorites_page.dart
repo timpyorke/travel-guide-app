@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:travel_guide/widgets/welcome_banner.dart';
 
 import '../detail/feature_detail_page.dart';
 import '../home/models/home_feature.dart';
@@ -64,19 +65,22 @@ class FavoritesPage extends StatelessWidget {
     }).toList();
 
     return SafeArea(
-      child: Padding(
+      child: ListView.separated(
         padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Row(
+        itemCount: entries.length + 2,
+        separatorBuilder: (_, __) => const SizedBox(height: 16),
+        itemBuilder: (BuildContext context, int index) {
+          if (index == 0) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Expanded(
-                  child: Text(
-                    'Saved Plans',
-                    style: theme.textTheme.headlineSmall,
-                  ),
+                WelcomeBanner(
+                  imageUrl:
+                      'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1500&q=80',
+                  title: 'Saved Plans',
+                  subtitle: 'Trips you want to revisit or book soon.',
                 ),
+                const SizedBox(height: 16),
                 FilledButton.tonalIcon(
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
@@ -86,57 +90,54 @@ class FavoritesPage extends StatelessWidget {
                   icon: const Icon(Icons.menu_book),
                   label: const Text('View all'),
                 ),
+                const SizedBox(height: 16),
               ],
+            );
+          }
+          final int entryIndex = index - 1;
+          if (entryIndex >= entries.length) {
+            return const SizedBox.shrink();
+          }
+          final FeatureListEntry entry = entries[entryIndex];
+          final Color cardColor = switch (entryIndex % 3) {
+            0 => colors.primaryContainer,
+            1 => colors.secondaryContainer,
+            _ => colors.tertiaryContainer,
+          };
+          return Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(24),
             ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: ListView.separated(
-                itemCount: entries.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 16),
-                itemBuilder: (BuildContext context, int index) {
-                  final FeatureListEntry entry = entries[index];
-                  final Color cardColor = switch (index % 3) {
-                    0 => colors.primaryContainer,
-                    1 => colors.secondaryContainer,
-                    _ => colors.tertiaryContainer,
-                  };
-                  return Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: cardColor,
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: CircleAvatar(
-                        backgroundColor: colors.onPrimaryContainer.withOpacity(0.12),
-                        child: Icon(_favoritesFeature.icon,
-                            color: colors.onPrimaryContainer),
-                      ),
-                      title: Text(
-                        entry.title,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      subtitle: Text(entry.subtitle),
-                      trailing:
-                          const Icon(Icons.arrow_forward_ios_rounded, size: 16),
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => FeatureDetailPage(
-                            feature: _favoritesFeature,
-                            entry: entry,
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: CircleAvatar(
+                backgroundColor: colors.onPrimaryContainer.withOpacity(0.12),
+                child: Icon(
+                  _favoritesFeature.icon,
+                  color: colors.onPrimaryContainer,
+                ),
+              ),
+              title: Text(
+                entry.title,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              subtitle: Text(entry.subtitle),
+              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => FeatureDetailPage(
+                    feature: _favoritesFeature,
+                    entry: entry,
+                  ),
+                ),
               ),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
