@@ -1,0 +1,46 @@
+name: travel_guide
+description: A new Flutter project.
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_flavorizr: 2.4.1
+
+flutter:
+  uses-material-design: true
+
+flavorizr:
+  app:
+    android:
+      flavorDimensions: flavor-type
+      defaultConfig:
+        applicationId: com.codenour.travel_guide
+    ios:
+      bundleId: com.codenour.travel_guide
+  flavors:
+    development:
+      app:
+        name: Travel Guide Dev
+      android:
+        applicationId: com.codenour.travel_guide.dev
+      ios:
+        bundleId: com.codenour.travel_guide.dev
+    production:
+      app:
+        name: Travel Guide
+      android:
+        applicationId: com.codenour.travel_guide
+      ios:
+        bundleId: com.codenour.travel_guide
