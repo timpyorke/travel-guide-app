@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:travel_guide/base/models/app_lang_type.dart';
 
 import 'flavors.dart';
 import 'l10n/app_locale.dart';
@@ -24,12 +25,16 @@ class _AppState extends ConsumerState<App> {
     super.initState();
 
     _localization.init(
-      mapLocales: const <MapLocale>[
-        MapLocale('en', AppLocale.en, countryCode: 'US'),
-        MapLocale('th', AppLocale.th),
-        MapLocale('zh', AppLocale.zh),
+      mapLocales: <MapLocale>[
+        MapLocale(
+          AppLangType.en.langCode,
+          AppLocale.en,
+          countryCode: AppLangType.en.countryCode,
+        ),
+        MapLocale(AppLangType.th.langCode, AppLocale.th),
+        MapLocale(AppLangType.zh.langCode, AppLocale.zh),
       ],
-      initLanguageCode: 'en',
+      initLanguageCode: AppLangType.en.langCode,
     );
     _localization.onTranslatedLanguage = _handleTranslatedLanguage;
 
