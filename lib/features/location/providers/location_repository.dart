@@ -6,7 +6,7 @@ import '../data/location_repository.dart';
 part 'location_repository.g.dart';
 
 @Riverpod(keepAlive: true)
-Future<LocationRepository> locationRepository(LocationRepositoryRef ref) async {
+Future<LocationRepository> locationRepository(LocationRepository ref) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return SharedPreferencesLocationRepository(prefs);
 }

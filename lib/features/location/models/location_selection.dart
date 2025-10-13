@@ -1,29 +1,20 @@
-import 'package:meta/meta.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-@immutable
-class LocationSelection {
-  const LocationSelection({
-    required this.country,
-    required this.city,
-  });
+part 'location_selection.freezed.dart';
 
-  final String country;
-  final String city;
+@freezed
+abstract class LocationSelection with _$LocationSelection {
+  const factory LocationSelection({
+    required String country,
+    required String city,
+  }) = _LocationSelection;
 
-  LocationSelection copyWith({
-    String? country,
-    String? city,
-  }) {
-    return LocationSelection(
-      country: country ?? this.country,
-      city: city ?? this.city,
-    );
-  }
+  const LocationSelection._();
 
   Map<String, String> toJson() => <String, String>{
-        'country': country,
-        'city': city,
-      };
+    'country': country,
+    'city': city,
+  };
 
   static LocationSelection? fromJson(Map<String, Object?> json) {
     final String? country = json['country'] as String?;

@@ -92,7 +92,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final AsyncValue<LocationSelection?> locationState = ref.watch(
       locationControllerProvider,
     );
-    final LocationSelection? selection = locationState.valueOrNull;
+    final LocationSelection? selection = locationState.value;
     final String locationLabel = selection == null
         ? AppLocale.profileHomeBasePrompt.tr(context)
         : '${selection.city}, ${selection.country}';

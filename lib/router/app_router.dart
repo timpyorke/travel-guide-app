@@ -34,7 +34,7 @@ GoRouter appRouter(Ref ref) {
       );
       final String currentPath = state.matchedLocation;
       final bool isOnboarding = currentPath == AppRoute.onboarding.path;
-      final bool hasLocation = locationState.valueOrNull != null;
+      final bool hasLocation = locationState.value != null;
 
       if (locationState.isLoading) {
         return null;

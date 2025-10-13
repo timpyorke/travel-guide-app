@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 import '../models/auth_state.dart';
 
@@ -15,8 +15,4 @@ class AuthController extends StateNotifier<AuthState> {
 }
 
 final StateNotifierProvider<AuthController, AuthState> authControllerProvider =
-    StateNotifierProvider<AuthController, AuthState>(
-  (StateNotifierProviderRef<AuthController, AuthState> ref) {
-    return AuthController();
-  },
-);
+    StateNotifierProvider<AuthController, AuthState>((ref) => AuthController());

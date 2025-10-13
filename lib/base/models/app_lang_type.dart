@@ -1,5 +1,5 @@
 enum AppLangType {
-  en(langCode: 'en', countryCode: 'us'),
+  en(langCode: 'en', countryCode: 'US'),
   th(langCode: 'th', countryCode: 'th'),
   zh(langCode: 'zh', countryCode: 'cn');
 

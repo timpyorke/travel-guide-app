@@ -94,7 +94,7 @@ class _HomePageState extends ConsumerState<HomePage>
     final AsyncValue<LocationSelection?> locationState = ref.read(
       locationControllerProvider,
     );
-    final LocationSelection? selection = locationState.valueOrNull;
+    final LocationSelection? selection = locationState.value;
     if (selection == null) {
       return;
     }
@@ -112,8 +112,8 @@ class _HomePageState extends ConsumerState<HomePage>
     _locationListener = ref.listenManual<AsyncValue<LocationSelection?>>(
       locationControllerProvider,
       (previous, next) {
-        final prevSelection = previous?.valueOrNull;
-        final nextSelection = next.valueOrNull;
+        final prevSelection = previous?.value;
+        final nextSelection = next.value;
         if (prevSelection == null && nextSelection != null) {
           _maybePromptAuth();
         }
@@ -319,7 +319,7 @@ class _HomePageState extends ConsumerState<HomePage>
     final AsyncValue<LocationSelection?> locationState = ref.watch(
       locationControllerProvider,
     );
-    final LocationSelection? selection = locationState.valueOrNull;
+    final LocationSelection? selection = locationState.value;
     const List<MockTrip> upcomingTrips = <MockTrip>[
       MockTrip(
         title: 'Spring Escape',
