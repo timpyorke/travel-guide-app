@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'flavors.dart';
 import 'l10n/app_locale.dart';
+import 'features/location/providers/location_controller.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
 
@@ -31,6 +32,13 @@ class _AppState extends ConsumerState<App> {
       initLanguageCode: 'en',
     );
     _localization.onTranslatedLanguage = _handleTranslatedLanguage;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      ref.read(locationControllerProvider.notifier).syncWithDeviceLocation();
+    });
   }
 
   @override
