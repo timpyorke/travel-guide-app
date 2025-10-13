@@ -75,3 +75,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Generated code (Freezed, json_serializable, etc.)
+**/*.freezed.dart
+**/*.g.dart
+**/*.gen.dart
