@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:travel_guide/base/models/app_router_type.dart';
 
 import '../features/location/models/location_selection.dart';
 import '../features/location/providers/location_controller.dart';
@@ -15,20 +16,6 @@ import '../features/plan/plan_page.dart';
 import 'go_router_refresh_notifier.dart';
 
 part 'app_router.g.dart';
-
-enum AppRoute {
-  onboarding('/onboarding'),
-  home('/home'),
-  plan('/plan'),
-  explore('/explore'),
-  favorites('/favorites'),
-  profile('/profile'),
-  editLocation('/profile/edit-location');
-
-  const AppRoute(this.path);
-
-  final String path;
-}
 
 @Riverpod(keepAlive: true)
 GoRouter appRouter(Ref ref) {
@@ -123,7 +110,7 @@ GoRouter appRouter(Ref ref) {
                     const NoTransitionPage<void>(child: ProfilePage()),
                 routes: <RouteBase>[
                   GoRoute(
-                    path: 'edit-location',
+                    path: AppRoute.profile.path.split('/').last,
                     name: AppRoute.editLocation.name,
                     pageBuilder: (context, state) => const MaterialPage<void>(
                       child: OnboardingPage(isEditing: true),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:travel_guide/base/models/app_router_type.dart';
 import 'package:travel_guide/l10n/app_locale.dart';
 import 'package:travel_guide/widgets/profile_sections.dart';
 
@@ -11,7 +12,6 @@ import '../auth/providers/auth_provider.dart';
 import '../location/models/location_selection.dart';
 import '../location/providers/location_controller.dart';
 import '../../core/providers/first_launch_provider.dart';
-import '../../router/app_router.dart';
 import '../auth/widgets/auth_action_sheet.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
@@ -795,10 +795,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     if (!mounted) return;
     final SnackBar snackBar = SnackBar(
       content: Text(
-        AppLocale.profileSignedInAs.trParams(
-          context,
-          <String, String>{'name': displayName},
-        ),
+        AppLocale.profileSignedInAs.trParams(context, <String, String>{
+          'name': displayName,
+        }),
       ),
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -855,5 +854,3 @@ class _LanguageOption {
 
   String get code => locale.languageCode;
 }
-
-

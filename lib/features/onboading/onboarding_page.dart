@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:travel_guide/base/models/app_router_type.dart';
 
 import '../location/models/location_selection.dart';
 import '../location/providers/location_controller.dart';
-import '../../router/app_router.dart';
 
 class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key, this.isEditing = false});
@@ -145,10 +145,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               const SizedBox(height: 24),
               Text(
                 'Travel preferences',
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(fontWeight: FontWeight.w600),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 12),
               Wrap(

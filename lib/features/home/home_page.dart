@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:travel_guide/base/models/app_router_type.dart';
 import 'package:travel_guide/widgets/city_context_grid.dart';
 import 'package:travel_guide/widgets/city_detail_page.dart';
 import 'package:travel_guide/widgets/feature_card.dart';
@@ -20,7 +21,6 @@ import '../list/feature_list_page.dart';
 import '../../flavors.dart';
 import '../../core/providers/first_launch_provider.dart';
 import '../../l10n/app_locale.dart';
-import '../../router/app_router.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -75,8 +75,9 @@ class _HomePageState extends ConsumerState<HomePage>
     if (!mounted || _hasPromptedAuth) {
       return;
     }
-    final bool isFirstLaunch =
-        await ref.read(firstLaunchNotifierProvider.future);
+    final bool isFirstLaunch = await ref.read(
+      firstLaunchNotifierProvider.future,
+    );
     if (!isFirstLaunch) {
       _hasPromptedAuth = true;
       return;
@@ -90,8 +91,9 @@ class _HomePageState extends ConsumerState<HomePage>
       _hasPromptedAuth = true;
       return;
     }
-    final AsyncValue<LocationSelection?> locationState =
-        ref.read(locationControllerProvider);
+    final AsyncValue<LocationSelection?> locationState = ref.read(
+      locationControllerProvider,
+    );
     final LocationSelection? selection = locationState.valueOrNull;
     if (selection == null) {
       return;
@@ -131,7 +133,10 @@ class _HomePageState extends ConsumerState<HomePage>
     );
   }
 
-  Future<void> _handleAuthAction(String displayName, {required bool goToProfile}) async {
+  Future<void> _handleAuthAction(
+    String displayName, {
+    required bool goToProfile,
+  }) async {
     ref.read(authControllerProvider.notifier).signIn(name: displayName);
     await ref.read(firstLaunchNotifierProvider.notifier).markSeen();
     ref.read(authPromptDismissedProvider.notifier).state = true;
@@ -141,10 +146,9 @@ class _HomePageState extends ConsumerState<HomePage>
     } else {
       final SnackBar snackBar = SnackBar(
         content: Text(
-          AppLocale.profileSignedInAs.trParams(
-            context,
-            <String, String>{'name': displayName},
-          ),
+          AppLocale.profileSignedInAs.trParams(context, <String, String>{
+            'name': displayName,
+          }),
         ),
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
