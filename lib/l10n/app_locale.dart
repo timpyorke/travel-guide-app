@@ -14,6 +14,11 @@ mixin AppLocale {
   static const String preferenceWellness = 'preferenceWellness';
   static const String preferenceNightlife = 'preferenceNightlife';
   static const String preferenceFamily = 'preferenceFamily';
+  static const String navHome = 'navHome';
+  static const String navPlan = 'navPlan';
+  static const String navExplore = 'navExplore';
+  static const String navFavorites = 'navFavorites';
+  static const String navProfile = 'navProfile';
 
   static const String profileNameGuest = 'profileNameGuest';
   static const String profileTaglineDefault = 'profileTaglineDefault';
@@ -137,6 +142,11 @@ mixin AppLocale {
     preferenceWellness: 'Wellness',
     preferenceNightlife: 'Nightlife',
     preferenceFamily: 'Family-friendly',
+    navHome: 'Home',
+    navPlan: 'Plan',
+    navExplore: 'Explore',
+    navFavorites: 'Favorites',
+    navProfile: 'Profile',
 
     profileNameGuest: 'Traveler Guest',
     profileTaglineDefault: 'Sunrise chaser • Food lover',
@@ -237,6 +247,11 @@ mixin AppLocale {
     preferenceWellness: 'สุขภาพ',
     preferenceNightlife: 'เที่ยวกลางคืน',
     preferenceFamily: 'เหมาะสำหรับครอบครัว',
+    navHome: 'หน้าแรก',
+    navPlan: 'วางแผน',
+    navExplore: 'สำรวจ',
+    navFavorites: 'รายการโปรด',
+    navProfile: 'โปรไฟล์',
 
     profileNameGuest: 'แขกนักเดินทาง',
     profileTaglineDefault: 'ผู้ไล่ล่าพระอาทิตย์ • สายกิน',
@@ -337,6 +352,11 @@ mixin AppLocale {
     preferenceWellness: '身心健康',
     preferenceNightlife: '夜生活',
     preferenceFamily: '适合家庭',
+    navHome: '首页',
+    navPlan: '行程',
+    navExplore: '探索',
+    navFavorites: '收藏',
+    navProfile: '我的',
 
     profileNameGuest: '旅行访客',
     profileTaglineDefault: '追逐日出 • 热爱美食',
