@@ -31,6 +31,7 @@ mixin AppLocale {
   static const String profileLanguageTitle = 'profileLanguageTitle';
   static const String profileNotificationsTitle =
       'profileNotificationsTitle';
+  static const String profileFavoritesTitle = 'profileFavoritesTitle';
   static const String profilePrivacyTitle = 'profilePrivacyTitle';
   static const String profilePrivacySubtitle = 'profilePrivacySubtitle';
   static const String profileSupportTitle = 'profileSupportTitle';
@@ -150,6 +151,7 @@ mixin AppLocale {
     profileHomeBaseTitle: 'Travel home base',
     profileLanguageTitle: 'App language',
     profileNotificationsTitle: 'Notifications',
+    profileFavoritesTitle: 'Favorites & wishlists',
     profilePrivacyTitle: 'Privacy',
     profilePrivacySubtitle: 'Manage visibility and data',
     profileSupportTitle: 'Support',
@@ -249,6 +251,7 @@ mixin AppLocale {
     profileHomeBaseTitle: 'ฐานท่องเที่ยวหลัก',
     profileLanguageTitle: 'ภาษาของแอป',
     profileNotificationsTitle: 'การแจ้งเตือน',
+    profileFavoritesTitle: 'รายการโปรดและสิ่งที่อยากไป',
     profilePrivacyTitle: 'ความเป็นส่วนตัว',
     profilePrivacySubtitle: 'จัดการการมองเห็นและข้อมูล',
     profileSupportTitle: 'การสนับสนุน',
@@ -348,6 +351,7 @@ mixin AppLocale {
     profileHomeBaseTitle: '常用出发地',
     profileLanguageTitle: '应用语言',
     profileNotificationsTitle: '通知',
+    profileFavoritesTitle: '收藏与心愿单',
     profilePrivacyTitle: '隐私',
     profilePrivacySubtitle: '管理可见性和数据',
     profileSupportTitle: '客服支持',

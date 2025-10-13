@@ -67,7 +67,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final String resolvedCode =
-        _localization.currentLocale?.languageCode ?? _languageOptions.first.code;
+        _localization.currentLocale?.languageCode ??
+        _languageOptions.first.code;
     if (_selectedLanguageCode != resolvedCode) {
       _selectedLanguageCode = resolvedCode;
     }
@@ -78,7 +79,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final ThemeData theme = Theme.of(context);
     final AuthState authState = ref.watch(authControllerProvider);
     final bool isGuest = authState.isGuest;
-    final String effectiveName = authState.userName ??
+    final String effectiveName =
+        authState.userName ??
         _displayName ??
         AppLocale.profileNameGuest.tr(context);
     final String tagline = isGuest
@@ -101,8 +103,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         AppLocale.profileNotificationTripReminders.tr(context),
       if (_productUpdates)
         AppLocale.profileNotificationProductUpdates.tr(context),
-      if (_promoEmails)
-        AppLocale.profileNotificationPartnerOffers.tr(context),
+      if (_promoEmails) AppLocale.profileNotificationPartnerOffers.tr(context),
     ];
     final String notificationSubtitle = notificationFlags.isEmpty
         ? AppLocale.profileLanguageAllOff.tr(context)
@@ -126,15 +127,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               GuestAuthActions(
                 onSignIn: _openAuthSheet,
                 onCreateAccount: _openAuthSheet,
-                message:
-                    AppLocale.profileGuestCtaDescription.tr(context),
+                message: AppLocale.profileGuestCtaDescription.tr(context),
               ),
               const SizedBox(height: 32),
             ] else ...<Widget>[
               SectionHeader(
-                title: AppLocale.profileTravelPreferencesTitle.tr(
-                  context,
-                ),
+                title: AppLocale.profileTravelPreferencesTitle.tr(context),
                 action: TextButton.icon(
                   onPressed: _openProfileEditor,
                   icon: const Icon(Icons.tune, size: 18),
@@ -235,74 +233,81 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
           ),
           child: StatefulBuilder(
-            builder: (BuildContext context, void Function(void Function()) setModalState) {
-              return Padding(
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      AppLocale.profilePrivacySheetTitle.tr(context),
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    SwitchListTile.adaptive(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(
-                        AppLocale.profilePrivacyShareActivity.tr(context),
-                      ),
-                      subtitle: Text(
-                        AppLocale.profilePrivacyShareActivitySubtitle
-                            .tr(context),
-                      ),
-                      value: shareActivity,
-                      onChanged: (bool value) {
-                        setModalState(() => shareActivity = value);
-                      },
-                    ),
-                    SwitchListTile.adaptive(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(
-                        AppLocale.profilePrivacyPersonalizedTips.tr(context),
-                      ),
-                      subtitle: Text(
-                        AppLocale.profilePrivacyPersonalizedTipsSubtitle
-                            .tr(context),
-                      ),
-                      value: personalizedTips,
-                      onChanged: (bool value) {
-                        setModalState(() => personalizedTips = value);
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    Text(AppLocale.profilePrivacyFooter.tr(context)),
-                    const SizedBox(height: 24),
-                    Row(
+            builder:
+                (
+                  BuildContext context,
+                  void Function(void Function()) setModalState,
+                ) {
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () => Navigator.of(context).pop(false),
-                            child: Text(
-                              AppLocale.commonCancel.tr(context),
+                        Text(
+                          AppLocale.profilePrivacySheetTitle.tr(context),
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 16),
+                        SwitchListTile.adaptive(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(
+                            AppLocale.profilePrivacyShareActivity.tr(context),
+                          ),
+                          subtitle: Text(
+                            AppLocale.profilePrivacyShareActivitySubtitle.tr(
+                              context,
                             ),
                           ),
+                          value: shareActivity,
+                          onChanged: (bool value) {
+                            setModalState(() => shareActivity = value);
+                          },
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: FilledButton(
-                            onPressed: () => Navigator.of(context).pop(true),
-                            child: Text(AppLocale.commonSave.tr(context)),
+                        SwitchListTile.adaptive(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(
+                            AppLocale.profilePrivacyPersonalizedTips.tr(
+                              context,
+                            ),
                           ),
+                          subtitle: Text(
+                            AppLocale.profilePrivacyPersonalizedTipsSubtitle.tr(
+                              context,
+                            ),
+                          ),
+                          value: personalizedTips,
+                          onChanged: (bool value) {
+                            setModalState(() => personalizedTips = value);
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        Text(AppLocale.profilePrivacyFooter.tr(context)),
+                        const SizedBox(height: 24),
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(false),
+                                child: Text(AppLocale.commonCancel.tr(context)),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: FilledButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(true),
+                                child: Text(AppLocale.commonSave.tr(context)),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              );
-            },
+                  );
+                },
           ),
         );
       },
@@ -315,9 +320,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       });
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocale.profilePrivacyUpdated.tr(context)),
-        ),
+        SnackBar(content: Text(AppLocale.profilePrivacyUpdated.tr(context))),
       );
     }
   }
@@ -350,9 +353,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       children: <Widget>[
                         Text(
                           AppLocale.profileLanguageSheetTitle.tr(context),
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge
+                          style: Theme.of(context).textTheme.titleLarge
                               ?.copyWith(fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 12),
@@ -370,9 +371,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          AppLocale.profileLanguageSheetDescription.tr(
-                            context,
-                          ),
+                          AppLocale.profileLanguageSheetDescription.tr(context),
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                         const SizedBox(height: 20),
@@ -382,9 +381,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                               child: OutlinedButton(
                                 onPressed: () =>
                                     Navigator.of(context).pop(false),
-                                child: Text(
-                                  AppLocale.commonCancel.tr(context),
-                                ),
+                                child: Text(AppLocale.commonCancel.tr(context)),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -417,9 +414,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       _localization.translate(option.code);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocale.profileLanguageUpdated.tr(context)),
-        ),
+        SnackBar(content: Text(AppLocale.profileLanguageUpdated.tr(context))),
       );
     }
   }
@@ -445,8 +440,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ListTile(
                 leading: const Icon(Icons.help_center_outlined),
                 title: Text(AppLocale.profileSupportFaqTitle.tr(context)),
-                subtitle:
-                    Text(AppLocale.profileSupportFaqSubtitle.tr(context)),
+                subtitle: Text(AppLocale.profileSupportFaqSubtitle.tr(context)),
                 onTap: () {
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -461,8 +455,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ListTile(
                 leading: const Icon(Icons.email_outlined),
                 title: Text(AppLocale.profileSupportEmailTitle.tr(context)),
-                subtitle:
-                    Text(AppLocale.profileSupportEmailSubtitle.tr(context)),
+                subtitle: Text(
+                  AppLocale.profileSupportEmailSubtitle.tr(context),
+                ),
                 onTap: () {
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -477,8 +472,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ListTile(
                 leading: const Icon(Icons.chat_bubble_outline),
                 title: Text(AppLocale.profileSupportChatTitle.tr(context)),
-                subtitle:
-                    Text(AppLocale.profileSupportChatSubtitle.tr(context)),
+                subtitle: Text(
+                  AppLocale.profileSupportChatSubtitle.tr(context),
+                ),
                 onTap: () {
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -504,8 +500,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final TextEditingController taglineController = TextEditingController(
       text: _tagline ?? '',
     );
-    final Set<String> tempSelected =
-        Set<String>.from(_selectedPreferenceKeys);
+    final Set<String> tempSelected = Set<String>.from(_selectedPreferenceKeys);
 
     final bool? didSave = await showModalBottomSheet<bool>(
       context: context,
@@ -517,114 +512,115 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
           ),
           child: StatefulBuilder(
-            builder: (
-              BuildContext context,
-              void Function(void Function()) setModalState,
-            ) {
-              return SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(
-                      AppLocale.profileEditorTitle.tr(context),
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleLarge
-                          ?.copyWith(fontWeight: FontWeight.w700),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: nameController,
-                      textCapitalization: TextCapitalization.words,
-                      decoration: InputDecoration(
-                        labelText: AppLocale.profileEditorDisplayNameLabel
-                            .tr(context),
-                        border: const OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: taglineController,
-                      decoration: InputDecoration(
-                        labelText:
-                            AppLocale.profileEditorTaglineLabel.tr(context),
-                        hintText:
-                            AppLocale.profileEditorTaglineHint.tr(context),
-                        border: const OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      AppLocale.profileEditorPreferencesTitle.tr(context),
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleMedium
-                          ?.copyWith(fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: _availablePreferenceKeys.map(
-                        (String preference) {
-                          final bool isSelected =
-                              tempSelected.contains(preference);
-                          return FilterChip(
-                            label: Text(preference.tr(context)),
-                            selected: isSelected,
-                            onSelected: (bool value) {
-                              setModalState(() {
-                                if (value) {
-                                  tempSelected.add(preference);
-                                } else {
-                                  tempSelected.remove(preference);
-                                }
-                              });
-                            },
-                          );
-                        },
-                      ).toList(),
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
+            builder:
+                (
+                  BuildContext context,
+                  void Function(void Function()) setModalState,
+                ) {
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () =>
-                                Navigator.of(context).pop(false),
-                            child: Text(AppLocale.commonCancel.tr(context)),
+                        Text(
+                          AppLocale.profileEditorTitle.tr(context),
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: nameController,
+                          textCapitalization: TextCapitalization.words,
+                          decoration: InputDecoration(
+                            labelText: AppLocale.profileEditorDisplayNameLabel
+                                .tr(context),
+                            border: const OutlineInputBorder(),
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: FilledButton(
-                            onPressed: () {
-                              if (nameController.text.trim().isEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      AppLocale.profileEditorNameEmpty
-                                          .tr(context),
-                                    ),
-                                  ),
-                                );
-                                return;
-                              }
-                              Navigator.of(context).pop(true);
-                            },
-                            child: Text(
-                              AppLocale.commonSaveChanges.tr(context),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: taglineController,
+                          decoration: InputDecoration(
+                            labelText: AppLocale.profileEditorTaglineLabel.tr(
+                              context,
                             ),
+                            hintText: AppLocale.profileEditorTaglineHint.tr(
+                              context,
+                            ),
+                            border: const OutlineInputBorder(),
                           ),
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          AppLocale.profileEditorPreferencesTitle.tr(context),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: _availablePreferenceKeys.map((
+                            String preference,
+                          ) {
+                            final bool isSelected = tempSelected.contains(
+                              preference,
+                            );
+                            return FilterChip(
+                              label: Text(preference.tr(context)),
+                              selected: isSelected,
+                              onSelected: (bool value) {
+                                setModalState(() {
+                                  if (value) {
+                                    tempSelected.add(preference);
+                                  } else {
+                                    tempSelected.remove(preference);
+                                  }
+                                });
+                              },
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 24),
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(false),
+                                child: Text(AppLocale.commonCancel.tr(context)),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: FilledButton(
+                                onPressed: () {
+                                  if (nameController.text.trim().isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          AppLocale.profileEditorNameEmpty.tr(
+                                            context,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  Navigator.of(context).pop(true);
+                                },
+                                child: Text(
+                                  AppLocale.commonSaveChanges.tr(context),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              );
-            },
+                  );
+                },
           ),
         );
       },
@@ -643,9 +639,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       });
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocale.profileEditorUpdated.tr(context)),
-        ),
+        SnackBar(content: Text(AppLocale.profileEditorUpdated.tr(context))),
       );
     }
   }
@@ -678,17 +672,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       children: <Widget>[
                         Text(
                           AppLocale.profileNotificationsSheetTitle.tr(context),
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge
+                          style: Theme.of(context).textTheme.titleLarge
                               ?.copyWith(fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 16),
                         SwitchListTile.adaptive(
                           contentPadding: EdgeInsets.zero,
                           title: Text(
-                            AppLocale.profileNotificationTripReminders
-                                .tr(context),
+                            AppLocale.profileNotificationTripReminders.tr(
+                              context,
+                            ),
                           ),
                           subtitle: Text(
                             AppLocale.profileNotificationsTripRemindersSubtitle
@@ -701,8 +694,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         SwitchListTile.adaptive(
                           contentPadding: EdgeInsets.zero,
                           title: Text(
-                            AppLocale.profileNotificationProductUpdates
-                                .tr(context),
+                            AppLocale.profileNotificationProductUpdates.tr(
+                              context,
+                            ),
                           ),
                           subtitle: Text(
                             AppLocale.profileNotificationsProductUpdatesSubtitle
@@ -715,8 +709,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         SwitchListTile.adaptive(
                           contentPadding: EdgeInsets.zero,
                           title: Text(
-                            AppLocale.profileNotificationPartnerOffers
-                                .tr(context),
+                            AppLocale.profileNotificationPartnerOffers.tr(
+                              context,
+                            ),
                           ),
                           subtitle: Text(
                             AppLocale.profileNotificationsPartnerOffersSubtitle
@@ -733,8 +728,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                               child: OutlinedButton(
                                 onPressed: () =>
                                     Navigator.of(context).pop(false),
-                                child:
-                                    Text(AppLocale.commonCancel.tr(context)),
+                                child: Text(AppLocale.commonCancel.tr(context)),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -775,42 +769,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     await showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
+      isScrollControlled: true,
       builder: (BuildContext context) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                AppLocale.profileAuthSheetTitle.tr(context),
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                AppLocale.profileAuthSheetMessage.tr(context),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: _simulateSignIn,
-                      child: Text(AppLocale.commonSignIn.tr(context)),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: _simulateSignIn,
-                      child: Text(AppLocale.commonCreateAccount.tr(context)),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+        return SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+            child: _AuthActionSheet(
+              onSignIn: _simulateSignIn,
+              onSignUp: _simulateSignIn,
+            ),
           ),
         );
       },
@@ -827,10 +795,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          AppLocale.profileSignedInAs.trParams(
-            context,
-            <String, String>{'name': 'Avery Traveler'},
-          ),
+          AppLocale.profileSignedInAs.trParams(context, <String, String>{
+            'name': 'Avery Traveler',
+          }),
         ),
       ),
     );
@@ -855,9 +822,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       _personalizedTips = true;
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppLocale.profileSignedOut.tr(context)),
-      ),
+      SnackBar(content: Text(AppLocale.profileSignedOut.tr(context))),
     );
   }
 
@@ -881,13 +846,210 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 }
 
 class _LanguageOption {
-  const _LanguageOption({
-    required this.locale,
-    required this.labelKey,
-  });
+  const _LanguageOption({required this.locale, required this.labelKey});
 
   final Locale locale;
   final String labelKey;
 
   String get code => locale.languageCode;
+}
+
+class _AuthActionSheet extends StatelessWidget {
+  const _AuthActionSheet({required this.onSignIn, required this.onSignUp});
+
+  final VoidCallback onSignIn;
+  final VoidCallback onSignUp;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final TextTheme textTheme = theme.textTheme;
+    final ColorScheme colorScheme = theme.colorScheme;
+
+    final double maxHeight = MediaQuery.of(context).size.height * 0.9;
+    final double bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: maxHeight),
+      child: SingleChildScrollView(
+        padding: EdgeInsets.only(bottom: bottomInset),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.rocket_launch_outlined,
+                    color: colorScheme.onPrimaryContainer,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        AppLocale.profileAuthSheetTitle.tr(context),
+                        style: textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        AppLocale.profileAuthSheetMessage.tr(context),
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: <Widget>[
+                _AuthFeatureChip(
+                  icon: Icons.tune,
+                  label: AppLocale.profileTravelPreferencesTitle.tr(context),
+                ),
+                _AuthFeatureChip(
+                  icon: Icons.language,
+                  label: AppLocale.profileLanguageTitle.tr(context),
+                ),
+                _AuthFeatureChip(
+                  icon: Icons.notifications_active_outlined,
+                  label: AppLocale.profileNotificationsTitle.tr(context),
+                ),
+                _AuthFeatureChip(
+                  icon: Icons.favorite_outline,
+                  label: AppLocale.profileFavoritesTitle.tr(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: 28),
+            LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                if (constraints.maxWidth < 360) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      FilledButton.icon(
+                        onPressed: onSignIn,
+                        icon: const Icon(Icons.login_rounded),
+                        label: Text(AppLocale.commonSignIn.tr(context)),
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          textStyle: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
+                        onPressed: onSignUp,
+                        icon: const Icon(Icons.person_add_alt_1),
+                        label: Text(AppLocale.commonCreateAccount.tr(context)),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          textStyle: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                return Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: onSignIn,
+                        icon: const Icon(Icons.login_rounded),
+                        label: Text(AppLocale.commonSignIn.tr(context)),
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          textStyle: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: onSignUp,
+                        icon: const Icon(Icons.person_add_alt_1),
+                        label: Text(AppLocale.commonCreateAccount.tr(context)),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          textStyle: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            Center(
+              child: TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(AppLocale.commonCancel.tr(context)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AuthFeatureChip extends StatelessWidget {
+  const _AuthFeatureChip({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceVariant.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: colorScheme.outline.withOpacity(0.2)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Icon(icon, size: 18, color: colorScheme.primary),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              label,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
