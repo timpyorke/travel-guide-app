@@ -3,13 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
 import 'flavors.dart';
+import 'initialized.dart';
 
-void main() {
+Future<void> main() async {
+  await Initialized.ensure();
   F.appFlavor = Flavor.production;
 
-  runApp(
-    const ProviderScope(
-      child: App(),
-    ),
-  );
+  runApp(const ProviderScope(child: App()));
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:travel_guide/l10n/app_locale.dart';
 
 class ProfileHeader extends StatelessWidget {
   const ProfileHeader({
@@ -73,14 +74,14 @@ class GuestAuthActions extends StatelessWidget {
             Expanded(
               child: FilledButton(
                 onPressed: onSignIn,
-                child: const Text('Sign in'),
+                child: Text(AppLocale.commonSignIn.tr(context)),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: OutlinedButton(
                 onPressed: onCreateAccount,
-                child: const Text('Create account'),
+                child: Text(AppLocale.commonCreateAccount.tr(context)),
               ),
             ),
           ],
@@ -109,12 +110,12 @@ class PreferencesSection extends StatelessWidget {
     return Wrap(
       spacing: 12,
       runSpacing: 12,
-      children: options.map((String preference) {
-        final bool isSelected = selected.contains(preference);
+      children: options.map((String preferenceKey) {
+        final bool isSelected = selected.contains(preferenceKey);
         return ChoiceChip(
-          label: Text(preference),
+          label: Text(preferenceKey.tr(context)),
           selected: isSelected,
-          onSelected: (bool value) => onToggle(preference, value),
+          onSelected: (bool value) => onToggle(preferenceKey, value),
         );
       }).toList(),
     );

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:travel_guide/l10n/app_locale.dart';
 import 'package:travel_guide/widgets/profile_sections.dart';
 
 import '../auth/models/auth_state.dart';
@@ -17,32 +19,44 @@ class ProfilePage extends ConsumerStatefulWidget {
 }
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
-  static const List<String> _availablePreferences = <String>[
-    'Coastal',
-    'Cultural',
-    'Foodie',
-    'Photography',
-    'Outdoors',
-    'Wellness',
-    'Nightlife',
-    'Family-friendly',
+  static const List<String> _availablePreferenceKeys = <String>[
+    AppLocale.preferenceCoastal,
+    AppLocale.preferenceCultural,
+    AppLocale.preferenceFoodie,
+    AppLocale.preferencePhotography,
+    AppLocale.preferenceOutdoors,
+    AppLocale.preferenceWellness,
+    AppLocale.preferenceNightlife,
+    AppLocale.preferenceFamily,
   ];
 
-  String _displayName = 'Traveler Guest';
-  String _tagline = 'Sunrise chaser • Food lover';
-  final Set<String> _selectedPreferences = <String>{
-    'Coastal',
-    'Foodie',
-    'Photography',
+  final FlutterLocalization _localization = FlutterLocalization.instance;
+
+  final Set<String> _selectedPreferenceKeys = <String>{
+    AppLocale.preferenceCoastal,
+    AppLocale.preferenceFoodie,
+    AppLocale.preferencePhotography,
   };
-  final List<String> _supportedLanguages = <String>[
-    'English (US)',
-    'Français',
-    'Deutsch',
-    'ไทย',
-    '日本語',
+
+  late final List<_LanguageOption> _languageOptions = <_LanguageOption>[
+    _LanguageOption(
+      locale: const Locale('en', 'US'),
+      labelKey: AppLocale.languageEnglishUs,
+    ),
+    _LanguageOption(
+      locale: const Locale('th', 'TH'),
+      labelKey: AppLocale.languageThai,
+    ),
+    _LanguageOption(
+      locale: const Locale('zh', 'CN'),
+      labelKey: AppLocale.languageChinese,
+    ),
   ];
-  String _selectedLanguage = 'English (US)';
+
+  String? _displayName;
+  String? _tagline;
+  String _selectedLanguageCode =
+      FlutterLocalization.instance.currentLocale?.languageCode ?? 'en';
   bool _shareActivity = true;
   bool _personalizedTips = true;
   bool _tripReminders = true;
@@ -50,28 +64,48 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   bool _promoEmails = false;
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final String resolvedCode =
+        _localization.currentLocale?.languageCode ?? _languageOptions.first.code;
+    if (_selectedLanguageCode != resolvedCode) {
+      _selectedLanguageCode = resolvedCode;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final AuthState authState = ref.watch(authControllerProvider);
     final bool isGuest = authState.isGuest;
-    final String effectiveName = authState.userName ?? _displayName;
-    final String tagline = authState.isGuest
-        ? 'Sign in to personalize suggestions'
-        : _tagline;
+    final String effectiveName = authState.userName ??
+        _displayName ??
+        AppLocale.profileNameGuest.tr(context);
+    final String tagline = isGuest
+        ? AppLocale.profileTaglineGuest.tr(context)
+        : (_tagline ?? AppLocale.profileTaglineDefault.tr(context));
     final AsyncValue<LocationSelection?> locationState = ref.watch(
       locationControllerProvider,
     );
     final LocationSelection? selection = locationState.valueOrNull;
     final String locationLabel = selection == null
-        ? 'Set a home base to personalize trips'
+        ? AppLocale.profileHomeBasePrompt.tr(context)
         : '${selection.city}, ${selection.country}';
+    final _LanguageOption activeLanguage = _languageOptions.firstWhere(
+      (_LanguageOption option) => option.code == _selectedLanguageCode,
+      orElse: () => _languageOptions.first,
+    );
+    final String languageLabel = activeLanguage.labelKey.tr(context);
     final List<String> notificationFlags = <String>[
-      if (_tripReminders) 'Trip reminders',
-      if (_productUpdates) 'Product updates',
-      if (_promoEmails) 'Partner offers',
+      if (_tripReminders)
+        AppLocale.profileNotificationTripReminders.tr(context),
+      if (_productUpdates)
+        AppLocale.profileNotificationProductUpdates.tr(context),
+      if (_promoEmails)
+        AppLocale.profileNotificationPartnerOffers.tr(context),
     ];
     final String notificationSubtitle = notificationFlags.isEmpty
-        ? 'All notifications off'
+        ? AppLocale.profileLanguageAllOff.tr(context)
         : notificationFlags.join(' • ');
 
     return SafeArea(
@@ -93,74 +127,79 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 onSignIn: _openAuthSheet,
                 onCreateAccount: _openAuthSheet,
                 message:
-                    'Sign in to save plans, sync preferences, and access exclusive itineraries.',
+                    AppLocale.profileGuestCtaDescription.tr(context),
               ),
               const SizedBox(height: 32),
             ] else ...<Widget>[
               SectionHeader(
-                title: 'Travel Preferences',
+                title: AppLocale.profileTravelPreferencesTitle.tr(
+                  context,
+                ),
                 action: TextButton.icon(
                   onPressed: _openProfileEditor,
                   icon: const Icon(Icons.tune, size: 18),
-                  label: const Text('Adjust'),
+                  label: Text(AppLocale.profileAdjustAction.tr(context)),
                 ),
               ),
               const SizedBox(height: 12),
               PreferencesSection(
-                options: _availablePreferences,
-                selected: _selectedPreferences,
+                options: _availablePreferenceKeys,
+                selected: _selectedPreferenceKeys,
                 onToggle: (String preference, bool value) {
                   setState(() {
                     if (value) {
-                      _selectedPreferences.add(preference);
+                      _selectedPreferenceKeys.add(preference);
                     } else {
-                      _selectedPreferences.remove(preference);
+                      _selectedPreferenceKeys.remove(preference);
                     }
                   });
                 },
               ),
               const SizedBox(height: 24),
             ],
-            Text('Account Settings', style: theme.textTheme.titleMedium),
+            Text(
+              AppLocale.profileAccountSettingsTitle.tr(context),
+              style: theme.textTheme.titleMedium,
+            ),
             const SizedBox(height: 12),
             ProfileSettingsCard(
               tiles: <SettingsTileData>[
                 if (!isGuest)
                   SettingsTileData(
                     icon: Icons.manage_accounts_outlined,
-                    title: 'Profile details',
-                    subtitle: 'Update name & travel style',
+                    title: AppLocale.profileDetailsTitle.tr(context),
+                    subtitle: AppLocale.profileDetailsSubtitle.tr(context),
                     onTap: _openProfileEditor,
                   ),
                 if (!isGuest)
                   SettingsTileData(
                     icon: Icons.place_outlined,
-                    title: 'Travel home base',
+                    title: AppLocale.profileHomeBaseTitle.tr(context),
                     subtitle: locationLabel,
                     onTap: () => context.pushNamed(AppRoute.editLocation.name),
                   ),
                 SettingsTileData(
                   icon: Icons.language,
-                  title: 'App language',
-                  subtitle: _selectedLanguage,
+                  title: AppLocale.profileLanguageTitle.tr(context),
+                  subtitle: languageLabel,
                   onTap: _openLanguageSheet,
                 ),
                 SettingsTileData(
                   icon: Icons.notifications_outlined,
-                  title: 'Notifications',
+                  title: AppLocale.profileNotificationsTitle.tr(context),
                   subtitle: notificationSubtitle,
                   onTap: isGuest ? _openAuthSheet : _openNotificationSettings,
                 ),
                 SettingsTileData(
                   icon: Icons.security,
-                  title: 'Privacy',
-                  subtitle: 'Manage visibility and data',
+                  title: AppLocale.profilePrivacyTitle.tr(context),
+                  subtitle: AppLocale.profilePrivacySubtitle.tr(context),
                   onTap: _openPrivacySettings,
                 ),
                 SettingsTileData(
                   icon: Icons.help_outline,
-                  title: 'Support',
-                  subtitle: 'FAQ and contact options',
+                  title: AppLocale.profileSupportTitle.tr(context),
+                  subtitle: AppLocale.profileSupportSubtitle.tr(context),
                   onTap: _openSupportSheet,
                 ),
               ],
@@ -172,7 +211,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   child: TextButton.icon(
                     onPressed: _handleSignOut,
                     icon: const Icon(Icons.logout),
-                    label: const Text('Sign out'),
+                    label: Text(AppLocale.profileSignOut.tr(context)),
                   ),
                 ),
               ),
@@ -204,7 +243,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      'Privacy controls',
+                      AppLocale.profilePrivacySheetTitle.tr(context),
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -212,9 +251,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     const SizedBox(height: 16),
                     SwitchListTile.adaptive(
                       contentPadding: EdgeInsets.zero,
-                      title: const Text('Share anonymous activity'),
-                      subtitle: const Text(
-                        'Improve recommendations by sharing aggregated travel engagement data.',
+                      title: Text(
+                        AppLocale.profilePrivacyShareActivity.tr(context),
+                      ),
+                      subtitle: Text(
+                        AppLocale.profilePrivacyShareActivitySubtitle
+                            .tr(context),
                       ),
                       value: shareActivity,
                       onChanged: (bool value) {
@@ -223,9 +265,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     ),
                     SwitchListTile.adaptive(
                       contentPadding: EdgeInsets.zero,
-                      title: const Text('Personalized tips'),
-                      subtitle: const Text(
-                        'Use your saved plans and preferences to tailor insights.',
+                      title: Text(
+                        AppLocale.profilePrivacyPersonalizedTips.tr(context),
+                      ),
+                      subtitle: Text(
+                        AppLocale.profilePrivacyPersonalizedTipsSubtitle
+                            .tr(context),
                       ),
                       value: personalizedTips,
                       onChanged: (bool value) {
@@ -233,23 +278,23 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'You can request a data export or account deletion at any time through support.',
-                    ),
+                    Text(AppLocale.profilePrivacyFooter.tr(context)),
                     const SizedBox(height: 24),
                     Row(
                       children: <Widget>[
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () => Navigator.of(context).pop(false),
-                            child: const Text('Cancel'),
+                            child: Text(
+                              AppLocale.commonCancel.tr(context),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: FilledButton(
                             onPressed: () => Navigator.of(context).pop(true),
-                            child: const Text('Save'),
+                            child: Text(AppLocale.commonSave.tr(context)),
                           ),
                         ),
                       ],
@@ -270,13 +315,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       });
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Privacy preferences updated')),
+        SnackBar(
+          content: Text(AppLocale.profilePrivacyUpdated.tr(context)),
+        ),
       );
     }
   }
 
   Future<void> _openLanguageSheet() async {
-    String tempLanguage = _selectedLanguage;
+    String tempLanguage = _selectedLanguageCode;
 
     final bool? saved = await showModalBottomSheet<bool>(
       context: context,
@@ -302,16 +349,18 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          'Choose app language',
-                          style: Theme.of(context).textTheme.titleLarge
+                          AppLocale.profileLanguageSheetTitle.tr(context),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
                               ?.copyWith(fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 12),
-                        ..._supportedLanguages.map(
-                          (String language) => RadioListTile<String>(
-                            value: language,
+                        ..._languageOptions.map(
+                          (_LanguageOption option) => RadioListTile<String>(
+                            value: option.code,
                             groupValue: tempLanguage,
-                            title: Text(language),
+                            title: Text(option.labelKey.tr(context)),
                             onChanged: (String? value) {
                               if (value != null) {
                                 modalSetState(() => tempLanguage = value);
@@ -321,7 +370,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'Interface translations roll out progressively. Choosing a language ensures you receive updates as soon as they are available.',
+                          AppLocale.profileLanguageSheetDescription.tr(
+                            context,
+                          ),
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                         const SizedBox(height: 20),
@@ -331,7 +382,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                               child: OutlinedButton(
                                 onPressed: () =>
                                     Navigator.of(context).pop(false),
-                                child: const Text('Cancel'),
+                                child: Text(
+                                  AppLocale.commonCancel.tr(context),
+                                ),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -339,7 +392,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                               child: FilledButton(
                                 onPressed: () =>
                                     Navigator.of(context).pop(true),
-                                child: const Text('Save'),
+                                child: Text(AppLocale.commonSave.tr(context)),
                               ),
                             ),
                           ],
@@ -353,13 +406,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       },
     );
 
-    if (saved == true && tempLanguage != _selectedLanguage) {
+    if (saved == true && tempLanguage != _selectedLanguageCode) {
+      final _LanguageOption option = _languageOptions.firstWhere(
+        (_LanguageOption element) => element.code == tempLanguage,
+        orElse: () => _languageOptions.first,
+      );
       setState(() {
-        _selectedLanguage = tempLanguage;
+        _selectedLanguageCode = tempLanguage;
       });
+      _localization.translate(option.code);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Language set to $_selectedLanguage')),
+        SnackBar(
+          content: Text(AppLocale.profileLanguageUpdated.tr(context)),
+        ),
       );
     }
   }
@@ -376,7 +436,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Need a hand?',
+                AppLocale.profileSupportSheetTitle.tr(context),
                 style: Theme.of(
                   context,
                 ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
@@ -384,41 +444,48 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               const SizedBox(height: 16),
               ListTile(
                 leading: const Icon(Icons.help_center_outlined),
-                title: const Text('Browse FAQs'),
-                subtitle: const Text(
-                  'View top questions about planning, saving, and privacy.',
-                ),
+                title: Text(AppLocale.profileSupportFaqTitle.tr(context)),
+                subtitle:
+                    Text(AppLocale.profileSupportFaqSubtitle.tr(context)),
                 onTap: () {
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('FAQ center coming soon.')),
+                    SnackBar(
+                      content: Text(
+                        AppLocale.profileSupportFaqComingSoon.tr(context),
+                      ),
+                    ),
                   );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.email_outlined),
-                title: const Text('Email support'),
-                subtitle: const Text('We typically reply within 24 hours.'),
+                title: Text(AppLocale.profileSupportEmailTitle.tr(context)),
+                subtitle:
+                    Text(AppLocale.profileSupportEmailSubtitle.tr(context)),
                 onTap: () {
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Email composer not wired yet.'),
+                    SnackBar(
+                      content: Text(
+                        AppLocale.profileSupportEmailToast.tr(context),
+                      ),
                     ),
                   );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.chat_bubble_outline),
-                title: const Text('Live chat'),
-                subtitle: const Text(
-                  'Connect with our travel team (weekdays 9-6 PST).',
-                ),
+                title: Text(AppLocale.profileSupportChatTitle.tr(context)),
+                subtitle:
+                    Text(AppLocale.profileSupportChatSubtitle.tr(context)),
                 onTap: () {
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Chat support launching soon.'),
+                    SnackBar(
+                      content: Text(
+                        AppLocale.profileSupportChatToast.tr(context),
+                      ),
                     ),
                   );
                 },
@@ -432,12 +499,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   Future<void> _openProfileEditor() async {
     final TextEditingController nameController = TextEditingController(
-      text: _displayName,
+      text: _displayName ?? '',
     );
     final TextEditingController taglineController = TextEditingController(
-      text: _tagline,
+      text: _tagline ?? '',
     );
-    final Set<String> tempSelected = Set<String>.from(_selectedPreferences);
+    final Set<String> tempSelected =
+        Set<String>.from(_selectedPreferenceKeys);
 
     final bool? didSave = await showModalBottomSheet<bool>(
       context: context,
@@ -449,104 +517,114 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
           ),
           child: StatefulBuilder(
-            builder:
-                (
-                  BuildContext context,
-                  void Function(void Function()) setModalState,
-                ) {
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
+            builder: (
+              BuildContext context,
+              void Function(void Function()) setModalState,
+            ) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      AppLocale.profileEditorTitle.tr(context),
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge
+                          ?.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: nameController,
+                      textCapitalization: TextCapitalization.words,
+                      decoration: InputDecoration(
+                        labelText: AppLocale.profileEditorDisplayNameLabel
+                            .tr(context),
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: taglineController,
+                      decoration: InputDecoration(
+                        labelText:
+                            AppLocale.profileEditorTaglineLabel.tr(context),
+                        hintText:
+                            AppLocale.profileEditorTaglineHint.tr(context),
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      AppLocale.profileEditorPreferencesTitle.tr(context),
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: _availablePreferenceKeys.map(
+                        (String preference) {
+                          final bool isSelected =
+                              tempSelected.contains(preference);
+                          return FilterChip(
+                            label: Text(preference.tr(context)),
+                            selected: isSelected,
+                            onSelected: (bool value) {
+                              setModalState(() {
+                                if (value) {
+                                  tempSelected.add(preference);
+                                } else {
+                                  tempSelected.remove(preference);
+                                }
+                              });
+                            },
+                          );
+                        },
+                      ).toList(),
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
                       children: <Widget>[
-                        Text(
-                          'Edit profile',
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(fontWeight: FontWeight.w700),
-                        ),
-                        const SizedBox(height: 16),
-                        TextField(
-                          controller: nameController,
-                          textCapitalization: TextCapitalization.words,
-                          decoration: const InputDecoration(
-                            labelText: 'Display name',
-                            border: OutlineInputBorder(),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () =>
+                                Navigator.of(context).pop(false),
+                            child: Text(AppLocale.commonCancel.tr(context)),
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        TextField(
-                          controller: taglineController,
-                          decoration: const InputDecoration(
-                            labelText: 'Travel tagline',
-                            hintText: 'Ex. Sunrise chaser • Food lover',
-                            border: OutlineInputBorder(),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: FilledButton(
+                            onPressed: () {
+                              if (nameController.text.trim().isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      AppLocale.profileEditorNameEmpty
+                                          .tr(context),
+                                    ),
+                                  ),
+                                );
+                                return;
+                              }
+                              Navigator.of(context).pop(true);
+                            },
+                            child: Text(
+                              AppLocale.commonSaveChanges.tr(context),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          'Travel preferences',
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 12,
-                          runSpacing: 12,
-                          children: _availablePreferences.map((
-                            String preference,
-                          ) {
-                            final bool isSelected = tempSelected.contains(
-                              preference,
-                            );
-                            return FilterChip(
-                              label: Text(preference),
-                              selected: isSelected,
-                              onSelected: (bool value) {
-                                setModalState(() {
-                                  if (value) {
-                                    tempSelected.add(preference);
-                                  } else {
-                                    tempSelected.remove(preference);
-                                  }
-                                });
-                              },
-                            );
-                          }).toList(),
-                        ),
-                        const SizedBox(height: 24),
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () =>
-                                    Navigator.of(context).pop(false),
-                                child: const Text('Cancel'),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: FilledButton(
-                                onPressed: () {
-                                  if (nameController.text.trim().isEmpty) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Name cannot be empty.'),
-                                      ),
-                                    );
-                                    return;
-                                  }
-                                  Navigator.of(context).pop(true);
-                                },
-                                child: const Text('Save changes'),
-                              ),
-                            ),
-                          ],
                         ),
                       ],
                     ),
-                  );
-                },
+                  ],
+                ),
+              );
+            },
           ),
         );
       },
@@ -555,17 +633,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     if (didSave == true) {
       setState(() {
         _displayName = nameController.text.trim();
-        _tagline = taglineController.text.trim().isEmpty
-            ? 'Inspired traveler'
-            : taglineController.text.trim();
-        _selectedPreferences
+        final String trimmedTagline = taglineController.text.trim();
+        _tagline = trimmedTagline.isEmpty
+            ? AppLocale.profilePreferencesTaglineFallback.tr(context)
+            : trimmedTagline;
+        _selectedPreferenceKeys
           ..clear()
           ..addAll(tempSelected);
       });
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Profile updated')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocale.profileEditorUpdated.tr(context)),
+        ),
+      );
     }
   }
 
@@ -596,16 +677,22 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          'Notification preferences',
-                          style: Theme.of(context).textTheme.titleLarge
+                          AppLocale.profileNotificationsSheetTitle.tr(context),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
                               ?.copyWith(fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 16),
                         SwitchListTile.adaptive(
                           contentPadding: EdgeInsets.zero,
-                          title: const Text('Trip reminders'),
-                          subtitle: const Text(
-                            'Stay on top of upcoming itineraries and saved routes.',
+                          title: Text(
+                            AppLocale.profileNotificationTripReminders
+                                .tr(context),
+                          ),
+                          subtitle: Text(
+                            AppLocale.profileNotificationsTripRemindersSubtitle
+                                .tr(context),
                           ),
                           value: tripReminders,
                           onChanged: (bool value) =>
@@ -613,9 +700,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         ),
                         SwitchListTile.adaptive(
                           contentPadding: EdgeInsets.zero,
-                          title: const Text('Product updates'),
-                          subtitle: const Text(
-                            'Learn about new destinations and app features.',
+                          title: Text(
+                            AppLocale.profileNotificationProductUpdates
+                                .tr(context),
+                          ),
+                          subtitle: Text(
+                            AppLocale.profileNotificationsProductUpdatesSubtitle
+                                .tr(context),
                           ),
                           value: productUpdates,
                           onChanged: (bool value) =>
@@ -623,9 +714,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         ),
                         SwitchListTile.adaptive(
                           contentPadding: EdgeInsets.zero,
-                          title: const Text('Partner offers'),
-                          subtitle: const Text(
-                            'Get curated deals and exclusive promotions.',
+                          title: Text(
+                            AppLocale.profileNotificationPartnerOffers
+                                .tr(context),
+                          ),
+                          subtitle: Text(
+                            AppLocale.profileNotificationsPartnerOffersSubtitle
+                                .tr(context),
                           ),
                           value: promoEmails,
                           onChanged: (bool value) =>
@@ -638,7 +733,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                               child: OutlinedButton(
                                 onPressed: () =>
                                     Navigator.of(context).pop(false),
-                                child: const Text('Cancel'),
+                                child:
+                                    Text(AppLocale.commonCancel.tr(context)),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -646,7 +742,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                               child: FilledButton(
                                 onPressed: () =>
                                     Navigator.of(context).pop(true),
-                                child: const Text('Save'),
+                                child: Text(AppLocale.commonSave.tr(context)),
                               ),
                             ),
                           ],
@@ -668,7 +764,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       });
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Notification preferences updated')),
+        SnackBar(
+          content: Text(AppLocale.profileNotificationsUpdated.tr(context)),
+        ),
       );
     }
   }
@@ -685,14 +783,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Ready to personalize?',
+                AppLocale.profileAuthSheetTitle.tr(context),
                 style: Theme.of(
                   context,
                 ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 12),
-              const Text(
-                'Sign in or create a Travel Guide account to save plans, sync preferences, and unlock exclusive itineraries.',
+              Text(
+                AppLocale.profileAuthSheetMessage.tr(context),
               ),
               const SizedBox(height: 24),
               Row(
@@ -700,14 +798,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   Expanded(
                     child: FilledButton(
                       onPressed: _simulateSignIn,
-                      child: const Text('Sign in'),
+                      child: Text(AppLocale.commonSignIn.tr(context)),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: OutlinedButton(
                       onPressed: _simulateSignIn,
-                      child: const Text('Create account'),
+                      child: Text(AppLocale.commonCreateAccount.tr(context)),
                     ),
                   ),
                 ],
@@ -724,31 +822,43 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     ref.read(authControllerProvider.notifier).signIn(name: 'Avery Traveler');
     setState(() {
       _displayName = 'Avery Traveler';
-      _tagline = 'Always chasing golden hours';
+      _tagline = AppLocale.profileTaglineSignedIn.tr(context);
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Signed in as Avery Traveler')),
+      SnackBar(
+        content: Text(
+          AppLocale.profileSignedInAs.trParams(
+            context,
+            <String, String>{'name': 'Avery Traveler'},
+          ),
+        ),
+      ),
     );
   }
 
   void _handleSignOut() {
     ref.read(authControllerProvider.notifier).signOut();
     setState(() {
-      _displayName = 'Traveler Guest';
-      _tagline = 'Sign in to personalize suggestions';
-      _selectedPreferences
+      _displayName = null;
+      _tagline = null;
+      _selectedPreferenceKeys
         ..clear()
-        ..addAll(<String>{'Coastal', 'Foodie', 'Photography'});
+        ..addAll(<String>{
+          AppLocale.preferenceCoastal,
+          AppLocale.preferenceFoodie,
+          AppLocale.preferencePhotography,
+        });
       _tripReminders = true;
       _productUpdates = true;
       _promoEmails = false;
       _shareActivity = true;
       _personalizedTips = true;
-      _selectedLanguage = _supportedLanguages.first;
     });
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Signed out')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocale.profileSignedOut.tr(context)),
+      ),
+    );
   }
 
   String _initials(String name) {
@@ -768,4 +878,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     }
     return (firstChar + secondChar).toUpperCase();
   }
+}
+
+class _LanguageOption {
+  const _LanguageOption({
+    required this.locale,
+    required this.labelKey,
+  });
+
+  final Locale locale;
+  final String labelKey;
+
+  String get code => locale.languageCode;
 }

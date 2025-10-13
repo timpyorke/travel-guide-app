@@ -14,8 +14,42 @@ import 'models/home_feature.dart';
 import '../list/feature_list_page.dart';
 import '../../flavors.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
+
+  @override
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage>
+    with SingleTickerProviderStateMixin {
+  final ScrollController _scrollController = ScrollController();
+  bool _isAtTop = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_handleScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_handleScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _handleScroll() {
+    if (!_scrollController.hasClients) {
+      return;
+    }
+    final bool atTop = _scrollController.position.pixels <= 0;
+    if (atTop != _isAtTop) {
+      setState(() {
+        _isAtTop = atTop;
+      });
+    }
+  }
 
   static const List<HomeFeature> _homeFeatures = <HomeFeature>[
     HomeFeature(
@@ -177,7 +211,7 @@ class HomePage extends ConsumerWidget {
   ];
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final AsyncValue<LocationSelection?> locationState = ref.watch(
       locationControllerProvider,
     );
@@ -226,14 +260,41 @@ class HomePage extends ConsumerWidget {
       'Economy': Icons.trending_up,
     };
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
-        onPressed: () => showQuickPlannerSheet(context),
-        icon: const Icon(Icons.add),
-        label: const Text('Plan trip'),
+      floatingActionButton: AnimatedScale(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+        scale: _isAtTop ? 1 : 0.94,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: AnimatedSize(
+            duration: const Duration(milliseconds: 240),
+            curve: Curves.fastOutSlowIn,
+            alignment: Alignment.center,
+            clipBehavior: Clip.hardEdge,
+            child: FloatingActionButton.extended(
+              backgroundColor: Theme.of(context).colorScheme.secondary,
+              onPressed: () => showQuickPlannerSheet(context),
+              icon: const Icon(Icons.add),
+              label: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 180),
+                switchInCurve: Curves.easeOut,
+                switchOutCurve: Curves.easeIn,
+                child: _isAtTop
+                    ? const Text(
+                        'Plan trip',
+                        key: ValueKey<String>('fab-label'),
+                      )
+                    : const SizedBox(key: ValueKey<String>('fab-empty')),
+              ),
+              isExtended: _isAtTop,
+              shape: const StadiumBorder(),
+            ),
+          ),
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
+          controller: _scrollController,
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
