@@ -10,6 +10,7 @@ import '../auth/providers/auth_prompt_provider.dart';
 import '../auth/providers/auth_provider.dart';
 import '../location/models/location_selection.dart';
 import '../location/providers/location_controller.dart';
+import '../../core/providers/first_launch_provider.dart';
 import '../../router/app_router.dart';
 import '../auth/widgets/auth_action_sheet.dart';
 
@@ -785,6 +786,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   Future<void> _completeAuth(String displayName) async {
     ref.read(authControllerProvider.notifier).signIn(name: displayName);
+    await ref.read(firstLaunchNotifierProvider.notifier).markSeen();
+    ref.read(authPromptDismissedProvider.notifier).state = true;
     setState(() {
       _displayName = displayName;
       _tagline = AppLocale.profileTaglineSignedIn.tr(context);

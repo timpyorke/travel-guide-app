@@ -18,6 +18,7 @@ import '../location/providers/location_controller.dart';
 import 'models/home_feature.dart';
 import '../list/feature_list_page.dart';
 import '../../flavors.dart';
+import '../../core/providers/first_launch_provider.dart';
 import '../../l10n/app_locale.dart';
 import '../../router/app_router.dart';
 
@@ -74,6 +75,12 @@ class _HomePageState extends ConsumerState<HomePage>
     if (!mounted || _hasPromptedAuth) {
       return;
     }
+    final bool isFirstLaunch =
+        await ref.read(firstLaunchNotifierProvider.future);
+    if (!isFirstLaunch) {
+      _hasPromptedAuth = true;
+      return;
+    }
     if (promptDismissed) {
       _hasPromptedAuth = true;
       return;
@@ -95,9 +102,8 @@ class _HomePageState extends ConsumerState<HomePage>
       onSignIn: (name) => _handleAuthAction(name, goToProfile: false),
       onSignUp: (name) => _handleAuthAction(name, goToProfile: true),
     );
-    if (mounted) {
-      ref.read(authPromptDismissedProvider.notifier).state = true;
-    }
+    ref.read(authPromptDismissedProvider.notifier).state = true;
+    await ref.read(firstLaunchNotifierProvider.notifier).markSeen();
   }
 
   void _setupLocationListener() {
@@ -127,6 +133,7 @@ class _HomePageState extends ConsumerState<HomePage>
 
   Future<void> _handleAuthAction(String displayName, {required bool goToProfile}) async {
     ref.read(authControllerProvider.notifier).signIn(name: displayName);
+    await ref.read(firstLaunchNotifierProvider.notifier).markSeen();
     ref.read(authPromptDismissedProvider.notifier).state = true;
     if (!mounted) return;
     if (goToProfile) {
