@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:travel_guide/widgets/city_context_grid.dart';
 import 'package:travel_guide/widgets/city_detail_page.dart';
 import 'package:travel_guide/widgets/feature_card.dart';
@@ -8,11 +9,16 @@ import 'package:travel_guide/widgets/quick_planner_sheet.dart';
 import 'package:travel_guide/widgets/travel_insights_section.dart';
 import 'package:travel_guide/widgets/welcome_banner.dart';
 
+import '../auth/models/auth_state.dart';
+import '../auth/providers/auth_prompt_provider.dart';
+import '../auth/providers/auth_provider.dart';
+import '../auth/widgets/auth_action_sheet.dart';
 import '../location/models/location_selection.dart';
 import '../location/providers/location_controller.dart';
 import 'models/home_feature.dart';
 import '../list/feature_list_page.dart';
 import '../../flavors.dart';
+import '../../router/app_router.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -25,15 +31,20 @@ class _HomePageState extends ConsumerState<HomePage>
     with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   bool _isAtTop = true;
+  bool _hasPromptedAuth = false;
+  ProviderSubscription<AsyncValue<LocationSelection?>>? _locationListener;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_handleScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybePromptAuth());
+    _setupLocationListener();
   }
 
   @override
   void dispose() {
+    _locationListener?.close();
     _scrollController.removeListener(_handleScroll);
     _scrollController.dispose();
     super.dispose();
@@ -49,6 +60,57 @@ class _HomePageState extends ConsumerState<HomePage>
         _isAtTop = atTop;
       });
     }
+  }
+
+  Future<void> _maybePromptAuth() async {
+    if (!mounted || _hasPromptedAuth) {
+      return;
+    }
+    final bool promptDismissed = ref.read(authPromptDismissedProvider);
+    if (promptDismissed) {
+      _hasPromptedAuth = true;
+      return;
+    }
+    final AuthState authState = ref.read(authControllerProvider);
+    if (!authState.isGuest) {
+      _hasPromptedAuth = true;
+      return;
+    }
+    final AsyncValue<LocationSelection?> locationState =
+        ref.read(locationControllerProvider);
+    final LocationSelection? selection = locationState.valueOrNull;
+    if (selection == null) {
+      return;
+    }
+    _hasPromptedAuth = true;
+    await showAuthActionSheet(
+      context: context,
+      onSignIn: () => _handleAuthAction(AppRoute.profile),
+      onSignUp: () => _handleAuthAction(AppRoute.profile),
+    );
+    if (mounted) {
+      ref.read(authPromptDismissedProvider.notifier).state = true;
+    }
+  }
+
+  void _setupLocationListener() {
+    _locationListener = ref.listenManual<AsyncValue<LocationSelection?>>(
+      locationControllerProvider,
+      (previous, next) {
+        final prevSelection = previous?.valueOrNull;
+        final nextSelection = next.valueOrNull;
+        if (prevSelection == null && nextSelection != null) {
+          _maybePromptAuth();
+        }
+      },
+    );
+  }
+
+  Future<void> _handleAuthAction(AppRoute route) async {
+    await Navigator.of(context).maybePop();
+    if (!mounted) return;
+    ref.read(authPromptDismissedProvider.notifier).state = true;
+    context.go(route.path);
   }
 
   static const List<HomeFeature> _homeFeatures = <HomeFeature>[
