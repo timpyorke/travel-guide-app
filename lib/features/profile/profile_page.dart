@@ -6,6 +6,7 @@ import 'package:travel_guide/l10n/app_locale.dart';
 import 'package:travel_guide/widgets/profile_sections.dart';
 
 import '../auth/models/auth_state.dart';
+import '../auth/providers/auth_prompt_provider.dart';
 import '../auth/providers/auth_provider.dart';
 import '../location/models/location_selection.dart';
 import '../location/providers/location_controller.dart';
@@ -770,30 +771,39 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     await showAuthActionSheet(
       context: context,
       onSignIn: _simulateSignIn,
-      onSignUp: _simulateSignIn,
+      onSignUp: _simulateSignUp,
     );
   }
 
-  void _simulateSignIn() {
-    Navigator.of(context).pop();
-    ref.read(authControllerProvider.notifier).signIn(name: 'Avery Traveler');
+  Future<void> _simulateSignIn(String displayName) async {
+    await _completeAuth(displayName);
+  }
+
+  Future<void> _simulateSignUp(String displayName) async {
+    await _completeAuth(displayName);
+  }
+
+  Future<void> _completeAuth(String displayName) async {
+    ref.read(authControllerProvider.notifier).signIn(name: displayName);
     setState(() {
-      _displayName = 'Avery Traveler';
+      _displayName = displayName;
       _tagline = AppLocale.profileTaglineSignedIn.tr(context);
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          AppLocale.profileSignedInAs.trParams(context, <String, String>{
-            'name': 'Avery Traveler',
-          }),
+    if (!mounted) return;
+    final SnackBar snackBar = SnackBar(
+      content: Text(
+        AppLocale.profileSignedInAs.trParams(
+          context,
+          <String, String>{'name': displayName},
         ),
       ),
     );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   void _handleSignOut() {
     ref.read(authControllerProvider.notifier).signOut();
+    ref.read(authPromptDismissedProvider.notifier).state = false;
     setState(() {
       _displayName = null;
       _tagline = null;

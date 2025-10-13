@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../l10n/app_locale.dart';
 
-typedef AuthActionCallback = void Function();
+typedef AuthActionCallback = Future<void> Function(String displayName);
 
 Future<void> showAuthActionSheet({
   required BuildContext context,
@@ -18,14 +18,21 @@ Future<void> showAuthActionSheet({
         top: false,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-          child: AuthActionSheet(
-            onSignIn: onSignIn,
-            onSignUp: onSignUp,
-          ),
+          child: AuthActionSheet(onSignIn: onSignIn, onSignUp: onSignUp),
         ),
       );
     },
   );
+}
+
+enum _AuthFlowMode { signIn, signUp }
+
+extension on _AuthFlowMode {
+  String title(BuildContext context) {
+    return this == _AuthFlowMode.signIn
+        ? AppLocale.commonSignIn.tr(context)
+        : AppLocale.commonCreateAccount.tr(context);
+  }
 }
 
 class AuthActionSheet extends StatelessWidget {
@@ -35,8 +42,8 @@ class AuthActionSheet extends StatelessWidget {
     required this.onSignUp,
   });
 
-  final VoidCallback onSignIn;
-  final VoidCallback onSignUp;
+  final AuthActionCallback onSignIn;
+  final AuthActionCallback onSignUp;
 
   @override
   Widget build(BuildContext context) {
@@ -117,88 +124,84 @@ class AuthActionSheet extends StatelessWidget {
             const SizedBox(height: 28),
             LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
-                if (constraints.maxWidth < 360) {
+                final bool isCompact = constraints.maxWidth < 360;
+                final Widget signInButton = FilledButton.icon(
+                  onPressed: () =>
+                      _openCredentialSheet(context, _AuthFlowMode.signIn),
+                  icon: const Icon(Icons.login_rounded),
+                  label: Text(AppLocale.commonSignIn.tr(context)),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    textStyle: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                );
+                final Widget signUpButton = OutlinedButton.icon(
+                  onPressed: () =>
+                      _openCredentialSheet(context, _AuthFlowMode.signUp),
+                  icon: const Icon(Icons.person_add_alt_1),
+                  label: Text(AppLocale.commonCreateAccount.tr(context)),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    textStyle: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                );
+                if (isCompact) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      FilledButton.icon(
-                        onPressed: onSignIn,
-                        icon: const Icon(Icons.login_rounded),
-                        label: Text(AppLocale.commonSignIn.tr(context)),
-                        style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          textStyle: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
+                      signInButton,
                       const SizedBox(height: 12),
-                      OutlinedButton.icon(
-                        onPressed: onSignUp,
-                        icon: const Icon(Icons.person_add_alt_1),
-                        label: Text(AppLocale.commonCreateAccount.tr(context)),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          textStyle: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
+                      signUpButton,
                     ],
                   );
                 }
                 return Row(
                   children: <Widget>[
-                    Expanded(
-                      child: FilledButton.icon(
-                        onPressed: onSignIn,
-                        icon: const Icon(Icons.login_rounded),
-                        label: Text(AppLocale.commonSignIn.tr(context)),
-                        style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          textStyle: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
+                    Expanded(child: signInButton),
                     const SizedBox(width: 12),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: onSignUp,
-                        icon: const Icon(Icons.person_add_alt_1),
-                        label: Text(AppLocale.commonCreateAccount.tr(context)),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          textStyle: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
+                    Expanded(child: signUpButton),
                   ],
                 );
               },
-            ),
-            const SizedBox(height: 16),
-            Center(
-              child: TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(AppLocale.commonCancel.tr(context)),
-              ),
             ),
           ],
         ),
       ),
     );
   }
+
+  Future<void> _openCredentialSheet(
+    BuildContext context,
+    _AuthFlowMode mode,
+  ) async {
+    final String? displayName = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return _AuthCredentialSheet(mode: mode);
+      },
+    );
+    if (displayName == null || displayName.trim().isEmpty) {
+      return;
+    }
+    final NavigatorState navigator = Navigator.of(context);
+    navigator.pop();
+    final String trimmed = displayName.trim();
+    if (mode == _AuthFlowMode.signIn) {
+      await onSignIn(trimmed);
+    } else {
+      await onSignUp(trimmed);
+    }
+  }
 }
 
 class _AuthFeatureChip extends StatelessWidget {
-  const _AuthFeatureChip({
-    required this.icon,
-    required this.label,
-  });
+  const _AuthFeatureChip({required this.icon, required this.label});
 
   final IconData icon;
   final String label;
@@ -213,18 +216,12 @@ class _AuthFeatureChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceVariant.withOpacity(0.6),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: colorScheme.outline.withOpacity(0.2),
-        ),
+        border: Border.all(color: colorScheme.outline.withOpacity(0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Icon(
-            icon,
-            size: 18,
-            color: colorScheme.primary,
-          ),
+          Icon(icon, size: 18, color: colorScheme.primary),
           const SizedBox(width: 8),
           Flexible(
             child: Text(
@@ -237,5 +234,93 @@ class _AuthFeatureChip extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _AuthCredentialSheet extends StatefulWidget {
+  const _AuthCredentialSheet({required this.mode});
+
+  final _AuthFlowMode mode;
+
+  @override
+  State<_AuthCredentialSheet> createState() => _AuthCredentialSheetState();
+}
+
+class _AuthCredentialSheetState extends State<_AuthCredentialSheet> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late final TextEditingController _nameController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final EdgeInsets padding =
+        MediaQuery.of(context).viewInsets +
+        const EdgeInsets.fromLTRB(24, 16, 24, 24);
+    final String title = widget.mode.title(context);
+
+    return SafeArea(
+      top: false,
+      child: SingleChildScrollView(
+        padding: padding,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Text(
+                title,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                AppLocale.profileAuthSheetMessage.tr(context),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _nameController,
+                textCapitalization: TextCapitalization.words,
+                decoration: InputDecoration(
+                  labelText: AppLocale.profileEditorDisplayNameLabel.tr(
+                    context,
+                  ),
+                ),
+                validator: (String? value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return AppLocale.profileEditorNameEmpty.tr(context);
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              FilledButton(onPressed: _submit, child: Text(title)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _submit() {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    Navigator.of(context).pop(_nameController.text.trim());
   }
 }

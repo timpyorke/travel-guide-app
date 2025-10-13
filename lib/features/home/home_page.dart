@@ -18,6 +18,7 @@ import '../location/providers/location_controller.dart';
 import 'models/home_feature.dart';
 import '../list/feature_list_page.dart';
 import '../../flavors.dart';
+import '../../l10n/app_locale.dart';
 import '../../router/app_router.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -33,6 +34,7 @@ class _HomePageState extends ConsumerState<HomePage>
   bool _isAtTop = true;
   bool _hasPromptedAuth = false;
   ProviderSubscription<AsyncValue<LocationSelection?>>? _locationListener;
+  ProviderSubscription<bool>? _promptStatusListener;
 
   @override
   void initState() {
@@ -40,11 +42,13 @@ class _HomePageState extends ConsumerState<HomePage>
     _scrollController.addListener(_handleScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) => _maybePromptAuth());
     _setupLocationListener();
+    _setupPromptDismissedListener();
   }
 
   @override
   void dispose() {
     _locationListener?.close();
+    _promptStatusListener?.close();
     _scrollController.removeListener(_handleScroll);
     _scrollController.dispose();
     super.dispose();
@@ -63,10 +67,13 @@ class _HomePageState extends ConsumerState<HomePage>
   }
 
   Future<void> _maybePromptAuth() async {
+    final bool promptDismissed = ref.read(authPromptDismissedProvider);
+    if (!promptDismissed && _hasPromptedAuth) {
+      _hasPromptedAuth = false;
+    }
     if (!mounted || _hasPromptedAuth) {
       return;
     }
-    final bool promptDismissed = ref.read(authPromptDismissedProvider);
     if (promptDismissed) {
       _hasPromptedAuth = true;
       return;
@@ -85,8 +92,8 @@ class _HomePageState extends ConsumerState<HomePage>
     _hasPromptedAuth = true;
     await showAuthActionSheet(
       context: context,
-      onSignIn: () => _handleAuthAction(AppRoute.profile),
-      onSignUp: () => _handleAuthAction(AppRoute.profile),
+      onSignIn: (name) => _handleAuthAction(name, goToProfile: false),
+      onSignUp: (name) => _handleAuthAction(name, goToProfile: true),
     );
     if (mounted) {
       ref.read(authPromptDismissedProvider.notifier).state = true;
@@ -106,11 +113,35 @@ class _HomePageState extends ConsumerState<HomePage>
     );
   }
 
-  Future<void> _handleAuthAction(AppRoute route) async {
-    await Navigator.of(context).maybePop();
-    if (!mounted) return;
+  void _setupPromptDismissedListener() {
+    _promptStatusListener = ref.listenManual<bool>(
+      authPromptDismissedProvider,
+      (previous, next) {
+        if (!next) {
+          _hasPromptedAuth = false;
+          _maybePromptAuth();
+        }
+      },
+    );
+  }
+
+  Future<void> _handleAuthAction(String displayName, {required bool goToProfile}) async {
+    ref.read(authControllerProvider.notifier).signIn(name: displayName);
     ref.read(authPromptDismissedProvider.notifier).state = true;
-    context.go(route.path);
+    if (!mounted) return;
+    if (goToProfile) {
+      context.go(AppRoute.profile.path);
+    } else {
+      final SnackBar snackBar = SnackBar(
+        content: Text(
+          AppLocale.profileSignedInAs.trParams(
+            context,
+            <String, String>{'name': displayName},
+          ),
+        ),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
   }
 
   static const List<HomeFeature> _homeFeatures = <HomeFeature>[
