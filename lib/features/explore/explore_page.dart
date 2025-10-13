@@ -236,7 +236,7 @@ class ExplorePage extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                tileColor: colorScheme.surfaceVariant,
+                tileColor: colorScheme.surfaceContainerHighest,
                 leading: CircleAvatar(
                   backgroundColor: colorScheme.primary,
                   child: Text(
