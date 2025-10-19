@@ -15,11 +15,8 @@ import '../auth/models/auth_state.dart';
 import '../auth/providers/auth_prompt_provider.dart';
 import '../auth/providers/auth_provider.dart';
 import '../auth/widgets/auth_action_sheet.dart';
-import '../location/models/location_selection.dart';
-import '../location/providers/location_controller.dart';
 import 'models/home_feature.dart';
 import '../list/feature_list_page.dart';
-import '../../flavors.dart';
 import '../../l10n/app_locale.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -34,7 +31,6 @@ class _HomePageState extends ConsumerState<HomePage>
   final ScrollController _scrollController = ScrollController();
   bool _isAtTop = true;
   bool _hasPromptedAuth = false;
-  ProviderSubscription<AsyncValue<LocationSelection?>>? _locationListener;
   ProviderSubscription<bool>? _promptStatusListener;
 
   @override
@@ -42,13 +38,11 @@ class _HomePageState extends ConsumerState<HomePage>
     super.initState();
     _scrollController.addListener(_handleScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) => _maybePromptAuth());
-    _setupLocationListener();
     _setupPromptDismissedListener();
   }
 
   @override
   void dispose() {
-    _locationListener?.close();
     _promptStatusListener?.close();
     _scrollController.removeListener(_handleScroll);
     _scrollController.dispose();
@@ -90,13 +84,6 @@ class _HomePageState extends ConsumerState<HomePage>
       _hasPromptedAuth = true;
       return;
     }
-    final AsyncValue<LocationSelection?> locationState = ref.read(
-      locationControllerProvider,
-    );
-    final LocationSelection? selection = locationState.value;
-    if (selection == null) {
-      return;
-    }
     _hasPromptedAuth = true;
     await showAuthActionSheet(
       context: context,
@@ -105,19 +92,6 @@ class _HomePageState extends ConsumerState<HomePage>
     );
     ref.read(authPromptDismissedProvider.notifier).state = true;
     pref.setFirstLaunch(true);
-  }
-
-  void _setupLocationListener() {
-    _locationListener = ref.listenManual<AsyncValue<LocationSelection?>>(
-      locationControllerProvider,
-      (previous, next) {
-        final prevSelection = previous?.value;
-        final nextSelection = next.value;
-        if (prevSelection == null && nextSelection != null) {
-          _maybePromptAuth();
-        }
-      },
-    );
   }
 
   void _setupPromptDismissedListener() {
@@ -316,10 +290,6 @@ class _HomePageState extends ConsumerState<HomePage>
 
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<LocationSelection?> locationState = ref.watch(
-      locationControllerProvider,
-    );
-    final LocationSelection? selection = locationState.value;
     const List<MockTrip> upcomingTrips = <MockTrip>[
       MockTrip(
         title: 'Spring Escape',
@@ -346,15 +316,6 @@ class _HomePageState extends ConsumerState<HomePage>
         readTime: '6 min read',
       ),
     ];
-    final String greetingSubtitle = selection == null
-        ? 'Set your travel home base to unlock tailored guides.'
-        : 'Exploring ideas for ${selection.city}, ${selection.country}.';
-    final String bannerTitle = selection == null
-        ? 'Welcome to ${F.title}'
-        : 'Welcome to ${selection.city}';
-    final String aboutLabel = selection?.city == null
-        ? 'About this destination'
-        : 'About ${selection?.city}';
     final Map<String, IconData> cityContext = <String, IconData>{
       'The city': Icons.location_city,
       'History': Icons.history_edu,
@@ -407,12 +368,12 @@ class _HomePageState extends ConsumerState<HomePage>
               WelcomeBanner(
                 imageUrl:
                     'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
-                title: bannerTitle,
-                subtitle: greetingSubtitle,
+                title: 'bannerTitle',
+                subtitle: 'greetingSubtitle',
               ),
               const SizedBox(height: 24),
               Text(
-                aboutLabel,
+                'aboutLabel',
                 style: Theme.of(
                   context,
                 ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
@@ -426,10 +387,7 @@ class _HomePageState extends ConsumerState<HomePage>
                         icon: entry.value,
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute<void>(
-                            builder: (_) => CityDetailPage(
-                              category: entry.key,
-                              city: selection?.city,
-                            ),
+                            builder: (_) => CityDetailPage(category: entry.key),
                           ),
                         ),
                       ),

@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:travel_guide/core/models/app_router_type.dart';
 
-import '../features/location/models/location_selection.dart';
-import '../features/location/providers/location_controller.dart';
+import 'package:travel_guide/core/models/app_router_type.dart';
+import 'package:travel_guide/core/providers/shared_preferences_provider.dart';
+
 import '../features/explore/explore_page.dart';
 import '../features/favorites/favorites_page.dart';
 import '../features/home/home_page.dart';
-import '../features/onboading/onboarding_view.dart';
 import '../features/main_navigation_shell.dart';
-import '../features/profile/profile_page.dart';
+import '../features/onboading/onboarding_view.dart';
 import '../features/plan/plan_page.dart';
+import '../features/profile/profile_page.dart';
 import 'go_router_refresh_notifier.dart';
 
 part 'app_router.g.dart';
@@ -21,7 +21,7 @@ part 'app_router.g.dart';
 GoRouter appRouter(Ref ref) {
   final GoRouterRefreshNotifier refreshNotifier = GoRouterRefreshNotifier(
     ref: ref,
-    listenable: locationControllerProvider,
+    listenable: sharedPreferencesProvider,
   );
   ref.onDispose(refreshNotifier.dispose);
 
@@ -29,22 +29,14 @@ GoRouter appRouter(Ref ref) {
     initialLocation: AppRoute.home.path,
     refreshListenable: refreshNotifier,
     redirect: (context, state) {
-      final AsyncValue<LocationSelection?> locationState = ref.read(
-        locationControllerProvider,
-      );
       final String currentPath = state.matchedLocation;
       final bool isOnboarding = currentPath == AppRoute.onboarding.path;
-      final bool hasLocation = locationState.value != null;
 
-      if (locationState.isLoading) {
-        return null;
-      }
-
-      if (!hasLocation && !isOnboarding) {
+      if (!isOnboarding) {
         return AppRoute.onboarding.path;
       }
 
-      if (hasLocation && isOnboarding) {
+      if (isOnboarding) {
         return AppRoute.home.path;
       }
 

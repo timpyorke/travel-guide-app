@@ -6,7 +6,6 @@ import 'package:travel_guide/core/models/app_lang_type.dart';
 
 import '../flavors.dart';
 import '../l10n/app_locale.dart';
-import '../features/location/providers/location_controller.dart';
 import '../router/app_router.dart';
 import '../theme/app_theme.dart';
 
@@ -42,7 +41,6 @@ class _AppState extends ConsumerState<App> {
       if (!mounted) {
         return;
       }
-      ref.read(locationControllerProvider.notifier).syncWithDeviceLocation();
     });
   }
 

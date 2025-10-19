@@ -10,8 +10,6 @@ import 'package:travel_guide/widgets/profile_sections.dart';
 import '../auth/models/auth_state.dart';
 import '../auth/providers/auth_prompt_provider.dart';
 import '../auth/providers/auth_provider.dart';
-import '../location/models/location_selection.dart';
-import '../location/providers/location_controller.dart';
 import '../auth/widgets/auth_action_sheet.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
@@ -89,13 +87,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final String tagline = isGuest
         ? AppLocale.profileTaglineGuest.tr(context)
         : (_tagline ?? AppLocale.profileTaglineDefault.tr(context));
-    final AsyncValue<LocationSelection?> locationState = ref.watch(
-      locationControllerProvider,
-    );
-    final LocationSelection? selection = locationState.value;
-    final String locationLabel = selection == null
-        ? AppLocale.profileHomeBasePrompt.tr(context)
-        : '${selection.city}, ${selection.country}';
+
     final _LanguageOption activeLanguage = _languageOptions.firstWhere(
       (_LanguageOption option) => option.code == _selectedLanguageCode,
       orElse: () => _languageOptions.first,
@@ -176,7 +168,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   SettingsTileData(
                     icon: Icons.place_outlined,
                     title: AppLocale.profileHomeBaseTitle.tr(context),
-                    subtitle: locationLabel,
+                    subtitle: '',
                     onTap: () => context.pushNamed(AppRoute.editLocation.name),
                   ),
                 SettingsTileData(
