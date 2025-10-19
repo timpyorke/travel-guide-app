@@ -4,10 +4,10 @@ import 'package:travel_guide/core/models/country_city.dart';
 import 'package:travel_guide/features/onboading/models/onboading_view_state.dart';
 
 class OnboardingViewModel extends Notifier<OnboadingViewState> {
+  
   @override
   OnboadingViewState build() {
-    Future.microtask(loadInit);
-    return state;
+    return OnboadingViewState();
   }
 
   void loadInit() {

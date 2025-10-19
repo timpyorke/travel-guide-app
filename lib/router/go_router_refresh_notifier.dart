@@ -1,24 +1,19 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+/// Bridges a [ChangeNotifier] with GoRouter's [Listenable] refresh API.
 class GoRouterRefreshNotifier extends ChangeNotifier {
-  GoRouterRefreshNotifier({
-    required Ref ref,
-    required ProviderListenable<dynamic> listenable,
-  }) {
-    _subscription = ref.listen<dynamic>(
-      listenable,
-      (_, __) => notifyListeners(),
-      fireImmediately: true,
-    );
+  GoRouterRefreshNotifier({required ChangeNotifier listenable})
+    : _listenable = listenable {
+    _listenable.addListener(_handleChange);
   }
 
-  late final ProviderSubscription<dynamic> _subscription;
+  final ChangeNotifier _listenable;
+
+  void _handleChange() => notifyListeners();
 
   @override
   void dispose() {
-    _subscription.close();
+    _listenable.removeListener(_handleChange);
     super.dispose();
   }
 }

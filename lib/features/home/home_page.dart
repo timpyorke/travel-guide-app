@@ -91,7 +91,7 @@ class _HomePageState extends ConsumerState<HomePage>
       onSignUp: (name) => _handleAuthAction(name, goToProfile: true),
     );
     ref.read(authPromptDismissedProvider.notifier).state = true;
-    pref.setFirstLaunch(true);
+    await pref.setFirstLaunchCompleted();
   }
 
   void _setupPromptDismissedListener() {
@@ -112,7 +112,7 @@ class _HomePageState extends ConsumerState<HomePage>
   }) async {
     final pref = ref.read(sharedPreferencesProvider);
     ref.read(authControllerProvider.notifier).signIn(name: displayName);
-    pref.setFirstLaunch(true);
+    await pref.setFirstLaunchCompleted();
     ref.read(authPromptDismissedProvider.notifier).state = true;
     if (!mounted) return;
     if (goToProfile) {

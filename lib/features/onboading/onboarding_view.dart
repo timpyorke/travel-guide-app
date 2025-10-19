@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:travel_guide/core/models/app_router_type.dart';
 import 'package:travel_guide/features/onboading/onboarding_view_model.dart';
 
 class OnboardingView extends ConsumerWidget {
@@ -14,10 +12,11 @@ class OnboardingView extends ConsumerWidget {
     final viewmodel = ref.read(onboardingViewModelProvider.notifier);
     final state = ref.watch(onboardingViewModelProvider);
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      viewmodel.loadInit();
+    });
+
     return Scaffold(
-      appBar: isEditing
-          ? AppBar(title: const Text('Change home location'))
-          : null,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),

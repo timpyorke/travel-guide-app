@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -19,24 +18,27 @@ part 'app_router.g.dart';
 
 @Riverpod(keepAlive: true)
 GoRouter appRouter(Ref ref) {
+  final SharedPreferencesProvider preferences = ref.read(
+    sharedPreferencesProvider,
+  );
   final GoRouterRefreshNotifier refreshNotifier = GoRouterRefreshNotifier(
-    ref: ref,
-    listenable: sharedPreferencesProvider,
+    listenable: preferences,
   );
   ref.onDispose(refreshNotifier.dispose);
 
   return GoRouter(
     initialLocation: AppRoute.home.path,
     refreshListenable: refreshNotifier,
-    redirect: (context, state) {
+    redirect: (BuildContext context, GoRouterState state) async {
+      final bool isFirstLaunch = await preferences.isFirstLaunch();
       final String currentPath = state.matchedLocation;
       final bool isOnboarding = currentPath == AppRoute.onboarding.path;
 
-      if (!isOnboarding) {
+      if (isFirstLaunch && !isOnboarding) {
         return AppRoute.onboarding.path;
       }
 
-      if (isOnboarding) {
+      if (!isFirstLaunch && isOnboarding) {
         return AppRoute.home.path;
       }
 
@@ -102,7 +104,7 @@ GoRouter appRouter(Ref ref) {
                     const NoTransitionPage<void>(child: ProfilePage()),
                 routes: <RouteBase>[
                   GoRoute(
-                    path: AppRoute.profile.path.split('/').last,
+                    path: AppRoute.editLocation.path.split('/').last,
                     name: AppRoute.editLocation.name,
                     pageBuilder: (context, state) => const MaterialPage<void>(
                       child: OnboardingView(isEditing: true),

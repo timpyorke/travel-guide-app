@@ -779,7 +779,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   Future<void> _completeAuth(String displayName) async {
     ref.read(authControllerProvider.notifier).signIn(name: displayName);
     final pref = ref.read(sharedPreferencesProvider);
-    pref.setFirstLaunch(true);
+    await pref.setFirstLaunchCompleted();
     ref.read(authPromptDismissedProvider.notifier).state = true;
     setState(() {
       _displayName = displayName;
