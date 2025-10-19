@@ -29,6 +29,8 @@ flutter pub get           # Install dependencies
 flutter run               # Launch the app on an attached device/emulator
 flutter analyze           # Static analysis
 flutter test              # Unit/widget tests (when available)
+
+dart run build_runner build --delete-conflicting-outputs
 ```
 
 ## Measuring Success
