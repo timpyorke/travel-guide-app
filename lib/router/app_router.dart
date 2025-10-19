@@ -9,7 +9,7 @@ import '../features/location/providers/location_controller.dart';
 import '../features/explore/explore_page.dart';
 import '../features/favorites/favorites_page.dart';
 import '../features/home/home_page.dart';
-import '../features/onboading/onboarding_page.dart';
+import '../features/onboading/onboarding_view.dart';
 import '../features/main_navigation_shell.dart';
 import '../features/profile/profile_page.dart';
 import '../features/plan/plan_page.dart';
@@ -55,7 +55,7 @@ GoRouter appRouter(Ref ref) {
         path: AppRoute.onboarding.path,
         name: AppRoute.onboarding.name,
         pageBuilder: (context, state) =>
-            const NoTransitionPage<void>(child: OnboardingPage()),
+            const NoTransitionPage<void>(child: OnboardingView()),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
@@ -113,7 +113,7 @@ GoRouter appRouter(Ref ref) {
                     path: AppRoute.profile.path.split('/').last,
                     name: AppRoute.editLocation.name,
                     pageBuilder: (context, state) => const MaterialPage<void>(
-                      child: OnboardingPage(isEditing: true),
+                      child: OnboardingView(isEditing: true),
                     ),
                   ),
                 ],

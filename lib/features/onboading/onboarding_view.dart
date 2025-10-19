@@ -5,16 +5,17 @@ import 'package:travel_guide/core/models/app_router_type.dart';
 
 import 'application/onboarding_controller.dart';
 
-class OnboardingPage extends ConsumerWidget {
-  const OnboardingPage({super.key, this.isEditing = false});
+class OnboardingView extends ConsumerWidget {
+  const OnboardingView({super.key, this.isEditing = false});
 
   final bool isEditing;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final OnboardingState state = ref.watch(onboardingControllerProvider);
-    final OnboardingController controller =
-        ref.read(onboardingControllerProvider.notifier);
+    final OnboardingController controller = ref.read(
+      onboardingControllerProvider.notifier,
+    );
 
     Future<void> handleSubmit() async {
       final OnboardingSubmitResult result = await controller.submit();
@@ -37,8 +38,7 @@ class OnboardingPage extends ConsumerWidget {
     }
 
     Future<void> handleClear() async {
-      final OnboardingSubmitResult result =
-          await controller.clearSelection();
+      final OnboardingSubmitResult result = await controller.clearSelection();
       if (!context.mounted) {
         return;
       }
@@ -60,8 +60,9 @@ class OnboardingPage extends ConsumerWidget {
         : 'Choose your travel home base';
 
     return Scaffold(
-      appBar:
-          isEditing ? AppBar(title: const Text('Change home location')) : null,
+      appBar: isEditing
+          ? AppBar(title: const Text('Change home location'))
+          : null,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -131,8 +132,9 @@ class OnboardingPage extends ConsumerWidget {
                     .map(
                       (String preference) => FilterChip(
                         label: Text(preference),
-                        selected:
-                            state.selectedPreferences.contains(preference),
+                        selected: state.selectedPreferences.contains(
+                          preference,
+                        ),
                         onSelected: isProcessing
                             ? null
                             : (_) => controller.togglePreference(preference),
