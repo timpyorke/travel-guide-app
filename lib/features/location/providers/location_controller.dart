@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../data/location_data.dart';
 import '../models/location_selection.dart';
 import '../services/device_location_service.dart';
-import 'device_location_service_provider.dart';
+import '../../../core/providers/device_location_service_provider.dart';
 import 'location_repository.dart';
 
 part 'location_controller.g.dart';

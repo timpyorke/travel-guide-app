@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:travel_guide/base/models/main_navigation_menu.dart';
+import 'package:travel_guide/core/models/main_navigation_menu.dart';
 
 class MainNavigationShell extends StatelessWidget {
   const MainNavigationShell({super.key, required this.navigationShell});

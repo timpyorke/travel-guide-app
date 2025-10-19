@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:travel_guide/base/models/app_router_type.dart';
+import 'package:travel_guide/core/models/app_router_type.dart';
+import 'package:travel_guide/core/providers/shared_preferences_provider.dart';
 import 'package:travel_guide/widgets/city_context_grid.dart';
 import 'package:travel_guide/widgets/city_detail_page.dart';
 import 'package:travel_guide/widgets/feature_card.dart';
@@ -19,7 +20,6 @@ import '../location/providers/location_controller.dart';
 import 'models/home_feature.dart';
 import '../list/feature_list_page.dart';
 import '../../flavors.dart';
-import '../../core/providers/first_launch_provider.dart';
 import '../../l10n/app_locale.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -68,6 +68,8 @@ class _HomePageState extends ConsumerState<HomePage>
   }
 
   Future<void> _maybePromptAuth() async {
+    final pref = ref.read(sharedPreferencesProvider);
+    final isFirstLaunch = await pref.isFirstLaunch();
     final bool promptDismissed = ref.read(authPromptDismissedProvider);
     if (!promptDismissed && _hasPromptedAuth) {
       _hasPromptedAuth = false;
@@ -75,9 +77,6 @@ class _HomePageState extends ConsumerState<HomePage>
     if (!mounted || _hasPromptedAuth) {
       return;
     }
-    final bool isFirstLaunch = await ref.read(
-      firstLaunchNotifierProvider.future,
-    );
     if (!isFirstLaunch) {
       _hasPromptedAuth = true;
       return;
@@ -105,7 +104,7 @@ class _HomePageState extends ConsumerState<HomePage>
       onSignUp: (name) => _handleAuthAction(name, goToProfile: true),
     );
     ref.read(authPromptDismissedProvider.notifier).state = true;
-    await ref.read(firstLaunchNotifierProvider.notifier).markSeen();
+    pref.setFirstLaunch(true);
   }
 
   void _setupLocationListener() {
@@ -137,8 +136,9 @@ class _HomePageState extends ConsumerState<HomePage>
     String displayName, {
     required bool goToProfile,
   }) async {
+    final pref = ref.read(sharedPreferencesProvider);
     ref.read(authControllerProvider.notifier).signIn(name: displayName);
-    await ref.read(firstLaunchNotifierProvider.notifier).markSeen();
+    pref.setFirstLaunch(true);
     ref.read(authPromptDismissedProvider.notifier).state = true;
     if (!mounted) return;
     if (goToProfile) {

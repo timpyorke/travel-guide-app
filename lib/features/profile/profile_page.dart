@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:travel_guide/base/models/app_router_type.dart';
+import 'package:travel_guide/core/models/app_router_type.dart';
+import 'package:travel_guide/core/providers/shared_preferences_provider.dart';
 import 'package:travel_guide/l10n/app_locale.dart';
 import 'package:travel_guide/widgets/profile_sections.dart';
 
@@ -11,7 +12,6 @@ import '../auth/providers/auth_prompt_provider.dart';
 import '../auth/providers/auth_provider.dart';
 import '../location/models/location_selection.dart';
 import '../location/providers/location_controller.dart';
-import '../../core/providers/first_launch_provider.dart';
 import '../auth/widgets/auth_action_sheet.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
@@ -786,7 +786,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   Future<void> _completeAuth(String displayName) async {
     ref.read(authControllerProvider.notifier).signIn(name: displayName);
-    await ref.read(firstLaunchNotifierProvider.notifier).markSeen();
+    final pref = ref.read(sharedPreferencesProvider);
+    pref.setFirstLaunch(true);
     ref.read(authPromptDismissedProvider.notifier).state = true;
     setState(() {
       _displayName = displayName;
