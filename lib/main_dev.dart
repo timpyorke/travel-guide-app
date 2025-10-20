@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'app.dart';
+import 'app/app.dart';
 import 'flavors.dart';
+import 'app/initialized.dart';
 
-void main() {
+Future<void> main() async {
+  await Initialized.ensure();
   F.appFlavor = Flavor.development;
 
-  runApp(const App());
+  runApp(const ProviderScope(child: App()));
 }
