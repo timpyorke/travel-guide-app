@@ -6,7 +6,7 @@ import 'flavors.dart';
 import 'app/initialized.dart';
 
 Future<void> main() async {
-  await Initialized.ensure();
+  await initialized();
   F.appFlavor = Flavor.development;
 
   runApp(const ProviderScope(child: App()));
