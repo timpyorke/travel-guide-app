@@ -51,11 +51,11 @@ flavorizr:
       android:
         applicationId: com.codenour.travel_guide.dev
       ios:
-        bundleId: com.codenour.travel_guide.dev
+        bundleId: com.codenour.travel-guide.dev
     production:
       app:
         name: Travel Guide
       android:
         applicationId: com.codenour.travel_guide
       ios:
-        bundleId: com.codenour.travel_guide
+        bundleId: com.codenour.travel-guide
