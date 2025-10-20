@@ -1,6 +1,6 @@
 name: travel_guide
 description: A new Flutter project.
-publish_to: 'none'
+publish_to: "none"
 
 version: 1.0.0+1
 
@@ -39,11 +39,11 @@ flutter:
 flavorizr:
   app:
     android:
-      flavorDimensions: flavor-type
+      flavorDimensions: api
       defaultConfig:
         applicationId: com.codenour.travel_guide
     ios:
-      bundleId: com.codenour.travel_guide
+      bundleId: com.codenour.travel-guide
   flavors:
     development:
       app:
