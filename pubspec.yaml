@@ -1,6 +1,6 @@
 name: travel_guide
 description: A new Flutter project.
-publish_to: 'none'
+publish_to: "none"
 
 version: 1.0.0+1
 
@@ -22,6 +22,7 @@ dependencies:
   geocoding: ^4.0.0
   freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
+  firebase_core: ^4.2.0
 
 dev_dependencies:
   flutter_test:
@@ -39,11 +40,11 @@ flutter:
 flavorizr:
   app:
     android:
-      flavorDimensions: flavor-type
+      flavorDimensions: api
       defaultConfig:
         applicationId: com.codenour.travel_guide
     ios:
-      bundleId: com.codenour.travel_guide
+      bundleId: com.codenour.travel-guide
   flavors:
     development:
       app:
@@ -51,11 +52,11 @@ flavorizr:
       android:
         applicationId: com.codenour.travel_guide.dev
       ios:
-        bundleId: com.codenour.travel_guide.dev
+        bundleId: com.codenour.travel-guide.dev
     production:
       app:
         name: Travel Guide
       android:
         applicationId: com.codenour.travel_guide
       ios:
-        bundleId: com.codenour.travel_guide
+        bundleId: com.codenour.travel-guide

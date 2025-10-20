@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "766228351603",
+    "project_id": "travel-guide-f6973",
+    "storage_bucket": "travel-guide-f6973.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:766228351603:android:6c227487e8a84a9349b806",
+        "android_client_info": {
+          "package_name": "com.codenour.travel_guide"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "766228351603-ugl7gs9ia5q4d2qfe7r1jivjkrqbtdh6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOd3A5PYBfuFRiHF8M7A6U8UfWpQWTCE4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "766228351603-ugl7gs9ia5q4d2qfe7r1jivjkrqbtdh6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "766228351603-kinlo2t2oov4tl1f9msd6djmikperut5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.codenour.travel-guide"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
